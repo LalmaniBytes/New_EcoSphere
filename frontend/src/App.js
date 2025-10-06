@@ -1,53 +1,85 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import axios from 'axios';
+import HomePage from './pages/HomePage';
+import ReportPage from './pages/ReportPage';
+import ChatPage from './pages/ChatPage';
+import Navigation from './components/Navigation';
+import { Toaster } from './components/ui/sonner';
+import '@/App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+// Set axios defaults
+axios.defaults.baseURL = API;
+
+function App() {
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [locationPermission, setLocationPermission] = useState('prompt');
 
   useEffect(() => {
-    helloWorldApi();
+    // Request location permission on app load
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+          setLocationPermission('granted');
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setLocationPermission('denied');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
+        }
+      );
+    }
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
+    <Router>
+      <div className="App min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-blue-50">
+        <Navigation />
+        
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route 
+            path="/" 
+            element={
+              <HomePage 
+                currentLocation={currentLocation}
+                setCurrentLocation={setCurrentLocation}
+                locationPermission={locationPermission}
+              />
+            } 
+          />
+          <Route 
+            path="/report" 
+            element={
+              <ReportPage 
+                currentLocation={currentLocation}
+                setCurrentLocation={setCurrentLocation}
+              />
+            } 
+          />
+          <Route 
+            path="/chat" 
+            element={
+              <ChatPage 
+                currentLocation={currentLocation}
+              />
+            } 
+          />
         </Routes>
-      </BrowserRouter>
-    </div>
+        
+        <Toaster position="top-right" />
+      </div>
+    </Router>
   );
 }
 
