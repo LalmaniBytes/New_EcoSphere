@@ -1,0 +1,113 @@
+{
+  "summary": {
+    "total_tests": 17,
+    "passed_tests": 17,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "test_timestamp": "2025-10-06T10:19:04.468823"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Root API Endpoint",
+      "success": true,
+      "details": "Status: 200, Response keys: ['message']",
+      "timestamp": "2025-10-06T10:18:26.107418"
+    },
+    {
+      "test_name": "Environmental Report API",
+      "success": true,
+      "details": "Status: 200, Response keys: ['location', 'aqi_data', 'weather_data', 'noise_level', 'water_logging_risk', 'civic_complaints', 'ai_suggestions', 'timestamp']",
+      "timestamp": "2025-10-06T10:18:48.447500"
+    },
+    {
+      "test_name": "Environmental Report Structure",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2025-10-06T10:18:48.448130"
+    },
+    {
+      "test_name": "AQI Data Structure",
+      "success": true,
+      "details": "AQI: 76, Status: Moderate",
+      "timestamp": "2025-10-06T10:18:48.448149"
+    },
+    {
+      "test_name": "AI Suggestions",
+      "success": true,
+      "details": "Generated 5 suggestions",
+      "timestamp": "2025-10-06T10:18:48.448157"
+    },
+    {
+      "test_name": "Create Civic Report",
+      "success": true,
+      "details": "Status: 200, Response keys: ['id', 'location', 'report_type', 'description', 'severity', 'timestamp', 'reporter_id', 'status']",
+      "timestamp": "2025-10-06T10:18:48.507377"
+    },
+    {
+      "test_name": "Civic Report Structure",
+      "success": true,
+      "details": "Report ID: c6576b21-0755-490a-8b74-9991926cb4c6",
+      "timestamp": "2025-10-06T10:18:48.507975"
+    },
+    {
+      "test_name": "Get Civic Reports",
+      "success": true,
+      "details": "Status: 200, Response keys: Non-dict response",
+      "timestamp": "2025-10-06T10:18:48.549192"
+    },
+    {
+      "test_name": "Civic Reports List",
+      "success": true,
+      "details": "Retrieved 2 reports",
+      "timestamp": "2025-10-06T10:18:48.549829"
+    },
+    {
+      "test_name": "Get Civic Reports with Location",
+      "success": true,
+      "details": "Status: 200, Response keys: Non-dict response",
+      "timestamp": "2025-10-06T10:18:48.587011"
+    },
+    {
+      "test_name": "Location-filtered Reports",
+      "success": true,
+      "details": "Retrieved 2 reports near location",
+      "timestamp": "2025-10-06T10:18:48.587596"
+    },
+    {
+      "test_name": "AI Chat Endpoint",
+      "success": true,
+      "details": "Status: 200, Response keys: ['response', 'suggestions']",
+      "timestamp": "2025-10-06T10:19:04.358360"
+    },
+    {
+      "test_name": "AI Chat Response Structure",
+      "success": true,
+      "details": "Response length: 1185, Suggestions: 4",
+      "timestamp": "2025-10-06T10:19:04.359010"
+    },
+    {
+      "test_name": "AI Chat Content Quality",
+      "success": true,
+      "details": "Response has meaningful content",
+      "timestamp": "2025-10-06T10:19:04.359030"
+    },
+    {
+      "test_name": "Water Logging Zones",
+      "success": true,
+      "details": "Status: 200, Response keys: ['prone_areas']",
+      "timestamp": "2025-10-06T10:19:04.433846"
+    },
+    {
+      "test_name": "Water Logging Data Structure",
+      "success": true,
+      "details": "Found 2 prone areas",
+      "timestamp": "2025-10-06T10:19:04.434422"
+    },
+    {
+      "test_name": "Error Handling - Invalid Data",
+      "success": true,
+      "details": "Status: 422, Response keys: ['detail']",
+      "timestamp": "2025-10-06T10:19:04.467989"
+    }
+  ]
+}
