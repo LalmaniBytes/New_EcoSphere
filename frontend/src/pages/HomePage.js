@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import MapComponent from "../components/MapComponent";
 import EnvironmentalReport from "../components/EnvironmentalReport";
 import axios from "axios";
+import { add } from "date-fns";
 
 const HomePage = ({
   currentLocation,
@@ -32,6 +33,15 @@ const HomePage = ({
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showReport, setShowReport] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  useEffect(() => {
+    // Run only if a location exists AND the initial load has NOT been completed.
+    if (currentLocation && !initialLoadComplete) {
+      handleLocationSelect(currentLocation);
+      setInitialLoadComplete(true);
+    }
+  }, [currentLocation, initialLoadComplete]);
 
   // Fetch environmental data for a location
   const fetchEnvironmentalData = async (location) => {
@@ -50,6 +60,7 @@ const HomePage = ({
       });
       const combinedData = {
         ...response.data,
+        location: location,
         traffic_data: trafficResponse.data.traffic,
         noise_data: trafficResponse.data.noise,
       };
@@ -66,9 +77,35 @@ const HomePage = ({
   };
 
   const handleLocationSelect = async (location) => {
-    setSelectedLocation(location);
-    setCurrentLocation(location);
-    fetchEnvironmentalData(location);
+    try {
+      // 1. Get the real address from the coordinates first
+      const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
+      const { data } = await axios.get(geoUrl);
+      const address =
+        data.display_name ||
+        `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
+
+      // 2. Create the final, updated location object
+      const updatedLocation = {
+        ...location,
+        address: address,
+      };
+
+      // 3. Update state with the final object
+      setSelectedLocation(updatedLocation);
+      setCurrentLocation(updatedLocation);
+      console.log("Selected Location:", updatedLocation);
+      console.log("Current Location:", updatedLocation);
+      // 4. NOW, call the data fetching function ONCE with the correct data
+      fetchEnvironmentalData(updatedLocation);
+    } catch (error) {
+      console.error("Error during reverse geocoding:", error);
+      toast.error("Failed to fetch location name.");
+      // Fallback: Use the original location if geocoding fails
+      setSelectedLocation(location);
+      setCurrentLocation(location);
+      fetchEnvironmentalData(location);
+    }
   };
 
   // Use current location
