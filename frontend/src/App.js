@@ -7,6 +7,7 @@ import ChatPage from './pages/ChatPage';
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
 import '@/App.css';
+import NoiseWidget from './hooks/NoiseWidget';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -75,6 +76,11 @@ function App() {
                 currentLocation={currentLocation}
               />
             } 
+          />
+          <Route 
+            path="/noise" 
+            element={
+              <NoiseWidget />} 
           />
         </Routes>
         

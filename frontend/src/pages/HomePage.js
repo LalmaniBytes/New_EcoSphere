@@ -1,15 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Thermometer, Wind, Droplets, Activity, AlertTriangle, Sparkles, RefreshCw } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { toast } from 'sonner';
-import MapComponent from '../components/MapComponent';
-import EnvironmentalReport from '../components/EnvironmentalReport';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  MapPin,
+  Thermometer,
+  Wind,
+  Droplets,
+  Activity,
+  AlertTriangle,
+  Sparkles,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { toast } from "sonner";
+import MapComponent from "../components/MapComponent";
+import EnvironmentalReport from "../components/EnvironmentalReport";
+import axios from "axios";
 
-const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) => {
+const HomePage = ({
+  currentLocation,
+  setCurrentLocation,
+  locationPermission,
+}) => {
   const [environmentalData, setEnvironmentalData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -19,25 +37,35 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
   const fetchEnvironmentalData = async (location) => {
     setLoading(true);
     try {
-      const response = await axios.post('/environmental-report', {
+      const response = await axios.post("/environmental-report", {
         latitude: location.latitude,
         longitude: location.longitude,
-        address: location.address || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`
+        address:
+          location.address ||
+          `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`,
       });
-      
-      setEnvironmentalData(response.data);
+      const trafficResponse = await axios.post("/traffic", {
+        lat: location.latitude,
+        lon: location.longitude,
+      });
+      const combinedData = {
+        ...response.data,
+        traffic_data: trafficResponse.data.traffic,
+        noise_data: trafficResponse.data.noise,
+      };
+      setEnvironmentalData(combinedData);
+      // setEnvironmentalData(response.data);
       setShowReport(true);
-      toast.success('Environmental data loaded successfully!');
+      toast.success("Environmental data loaded successfully!");
     } catch (error) {
-      console.error('Error fetching environmental data:', error);
-      toast.error('Failed to load environmental data. Please try again.');
+      console.error("Error fetching environmental data:", error);
+      toast.error("Failed to load environmental data. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle location selection from map
-  const handleLocationSelect = (location) => {
+  const handleLocationSelect = async (location) => {
     setSelectedLocation(location);
     setCurrentLocation(location);
     fetchEnvironmentalData(location);
@@ -52,18 +80,20 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
           const location = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            address: 'Current Location'
+            address: "Current Location",
           };
           handleLocationSelect(location);
         },
         (error) => {
-          console.error('Error getting current location:', error);
-          toast.error('Unable to get current location. Please select a location on the map.');
+          console.error("Error getting current location:", error);
+          toast.error(
+            "Unable to get current location. Please select a location on the map."
+          );
           setLoading(false);
         }
       );
     } else {
-      toast.error('Geolocation is not supported by this browser.');
+      toast.error("Geolocation is not supported by this browser.");
     }
   };
 
@@ -75,32 +105,63 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
   }, [currentLocation]);
 
   const getAQIStatus = (aqi) => {
-    if (aqi <= 50) return { status: 'Good', color: 'bg-green-500', textColor: 'text-green-700' };
-    if (aqi <= 100) return { status: 'Moderate', color: 'bg-yellow-500', textColor: 'text-yellow-700' };
-    if (aqi <= 150) return { status: 'Unhealthy for Sensitive Groups', color: 'bg-orange-500', textColor: 'text-orange-700' };
-    if (aqi <= 200) return { status: 'Unhealthy', color: 'bg-red-500', textColor: 'text-red-700' };
-    if (aqi <= 300) return { status: 'Very Unhealthy', color: 'bg-purple-500', textColor: 'text-purple-700' };
-    return { status: 'Hazardous', color: 'bg-red-800', textColor: 'text-red-900' };
+    if (aqi <= 50)
+      return {
+        status: "Good",
+        color: "bg-green-500",
+        textColor: "text-green-700",
+      };
+    if (aqi <= 100)
+      return {
+        status: "Moderate",
+        color: "bg-yellow-500",
+        textColor: "text-yellow-700",
+      };
+    if (aqi <= 150)
+      return {
+        status: "Unhealthy for Sensitive Groups",
+        color: "bg-orange-500",
+        textColor: "text-orange-700",
+      };
+    if (aqi <= 200)
+      return {
+        status: "Unhealthy",
+        color: "bg-red-500",
+        textColor: "text-red-700",
+      };
+    if (aqi <= 300)
+      return {
+        status: "Very Unhealthy",
+        color: "bg-purple-500",
+        textColor: "text-purple-700",
+      };
+    return {
+      status: "Hazardous",
+      color: "bg-red-800",
+      textColor: "text-red-900",
+    };
   };
-
+  console.log("Environmental Data:", environmentalData);
   return (
     <div className="min-h-screen pt-16">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-blue-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
-        
+
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
               <span className="gradient-text">Eco</span>Sphere
             </h1>
             <p className="text-xl md:text-2xl text-emerald-100 mb-8 max-w-3xl mx-auto animate-slide-up">
-              Your comprehensive environmental monitoring platform. Get real-time air quality, weather data, and AI-powered insights for any location.
+              Your comprehensive environmental monitoring platform. Get
+              real-time air quality, weather data, and AI-powered insights for
+              any location.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-              <Button 
+              <Button
                 onClick={useCurrentLocation}
                 disabled={loading}
                 className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-6 text-lg font-semibold rounded-full btn-hover"
@@ -111,16 +172,16 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
                 ) : (
                   <MapPin className="mr-2 h-5 w-5" />
                 )}
-                {loading ? 'Loading...' : 'Use Current Location'}
+                {loading ? "Loading..." : "Use Current Location"}
               </Button>
-              
+
               <p className="text-emerald-200 text-sm">
                 or click on the map below to select any location
               </p>
             </div>
           </div>
         </div>
-        
+
         {/* Decorative Earth Image */}
         <div className="absolute bottom-4 right-4 opacity-20">
           <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
@@ -141,7 +202,8 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
                   Location Selector
                 </CardTitle>
                 <p className="text-sm text-gray-600">
-                  Click anywhere on the map to get environmental data for that location
+                  Click anywhere on the map to get environmental data for that
+                  location
                 </p>
               </CardHeader>
               <CardContent>
@@ -162,31 +224,39 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Activity className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{environmentalData.aqi_data.aqi}</p>
+                    <p className="text-2xl font-bold">
+                      {environmentalData.aqi_data.aqi}
+                    </p>
                     <p className="text-sm text-gray-600">AQI</p>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Thermometer className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{environmentalData.weather_data.temperature}°</p>
+                    <p className="text-2xl font-bold">
+                      {environmentalData.weather_data.temperature}°
+                    </p>
                     <p className="text-sm text-gray-600">Temp</p>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Wind className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{environmentalData.weather_data.wind_speed}</p>
+                    <p className="text-2xl font-bold">
+                      {environmentalData.weather_data.wind_speed}
+                    </p>
                     <p className="text-sm text-gray-600">Wind km/h</p>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Droplets className="h-8 w-8 text-cyan-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{environmentalData.weather_data.humidity}%</p>
+                    <p className="text-2xl font-bold">
+                      {environmentalData.weather_data.humidity}%
+                    </p>
                     <p className="text-sm text-gray-600">Humidity</p>
                   </CardContent>
                 </Card>
@@ -197,9 +267,11 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
           {/* Environmental Report Section */}
           <div className="space-y-6">
             {showReport && environmentalData ? (
-              <EnvironmentalReport 
-                data={environmentalData} 
-                onRefresh={() => fetchEnvironmentalData(selectedLocation || currentLocation)}
+              <EnvironmentalReport
+                data={environmentalData}
+                onRefresh={() =>
+                  fetchEnvironmentalData(selectedLocation || currentLocation)
+                }
                 loading={loading}
               />
             ) : (
@@ -212,13 +284,16 @@ const HomePage = ({ currentLocation, setCurrentLocation, locationPermission }) =
                     Environmental Report Card
                   </h3>
                   <p className="text-gray-600 mb-6">
-                    Select a location to view comprehensive environmental data, air quality metrics, weather conditions, and AI-powered recommendations.
+                    Select a location to view comprehensive environmental data,
+                    air quality metrics, weather conditions, and AI-powered
+                    recommendations.
                   </p>
-                  {locationPermission === 'denied' && (
+                  {locationPermission === "denied" && (
                     <Alert className="max-w-md mx-auto">
                       <AlertTriangle className="h-4 w-4" />
                       <AlertDescription>
-                        Location access denied. Please click on the map to select a location manually.
+                        Location access denied. Please click on the map to
+                        select a location manually.
                       </AlertDescription>
                     </Alert>
                   )}

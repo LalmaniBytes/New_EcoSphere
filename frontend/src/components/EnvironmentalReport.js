@@ -1,71 +1,137 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { Progress } from './ui/progress';
-import { Alert, AlertDescription } from './ui/alert';
-import { Separator } from './ui/separator';
-import { 
-  Activity, 
-  Thermometer, 
-  Wind, 
-  Droplets, 
-  Eye, 
-  Volume2, 
-  Waves, 
-  RefreshCw, 
-  Lightbulb, 
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Progress } from "./ui/progress";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Separator } from "./ui/separator";
+import {
+  Activity,
+  Thermometer,
+  Wind,
+  Droplets,
+  Eye,
+  Volume2,
+  Waves,
+  RefreshCw,
+  Lightbulb,
   AlertTriangle,
   TrendingUp,
   Calendar,
-  MapPin
-} from 'lucide-react';
-import { toast } from 'sonner';
+  MapPin,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const EnvironmentalReport = ({ data, onRefresh, loading }) => {
   if (!data) return null;
 
-  const { aqi_data, weather_data, noise_level, water_logging_risk, civic_complaints, ai_suggestions, location } = data;
+  const {
+    aqi_data,
+    weather_data,
+    noise_data,
+    water_logging_risk,
+    civic_complaints,
+    ai_suggestions,
+    location,
+  } = data;
 
   const getAQIStatus = (aqi) => {
-    if (aqi <= 50) return { status: 'Good', color: 'bg-green-500', bgColor: 'bg-green-50', textColor: 'text-green-700', borderColor: 'border-green-200' };
-    if (aqi <= 100) return { status: 'Moderate', color: 'bg-yellow-500', bgColor: 'bg-yellow-50', textColor: 'text-yellow-700', borderColor: 'border-yellow-200' };
-    if (aqi <= 150) return { status: 'Unhealthy for Sensitive', color: 'bg-orange-500', bgColor: 'bg-orange-50', textColor: 'text-orange-700', borderColor: 'border-orange-200' };
-    if (aqi <= 200) return { status: 'Unhealthy', color: 'bg-red-500', bgColor: 'bg-red-50', textColor: 'text-red-700', borderColor: 'border-red-200' };
-    if (aqi <= 300) return { status: 'Very Unhealthy', color: 'bg-purple-500', bgColor: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200' };
-    return { status: 'Hazardous', color: 'bg-red-800', bgColor: 'bg-red-50', textColor: 'text-red-900', borderColor: 'border-red-300' };
+    if (aqi <= 50)
+      return {
+        status: "Good",
+        color: "bg-green-500",
+        bgColor: "bg-green-50",
+        textColor: "text-green-700",
+        borderColor: "border-green-200",
+      };
+    if (aqi <= 100)
+      return {
+        status: "Moderate",
+        color: "bg-yellow-500",
+        bgColor: "bg-yellow-50",
+        textColor: "text-yellow-700",
+        borderColor: "border-yellow-200",
+      };
+    if (aqi <= 150)
+      return {
+        status: "Unhealthy for Sensitive",
+        color: "bg-orange-500",
+        bgColor: "bg-orange-50",
+        textColor: "text-orange-700",
+        borderColor: "border-orange-200",
+      };
+    if (aqi <= 200)
+      return {
+        status: "Unhealthy",
+        color: "bg-red-500",
+        bgColor: "bg-red-50",
+        textColor: "text-red-700",
+        borderColor: "border-red-200",
+      };
+    if (aqi <= 300)
+      return {
+        status: "Very Unhealthy",
+        color: "bg-purple-500",
+        bgColor: "bg-purple-50",
+        textColor: "text-purple-700",
+        borderColor: "border-purple-200",
+      };
+    return {
+      status: "Hazardous",
+      color: "bg-red-800",
+      bgColor: "bg-red-50",
+      textColor: "text-red-900",
+      borderColor: "border-red-300",
+    };
   };
 
   const getWaterRiskColor = (risk) => {
     switch (risk) {
-      case 'low': return 'text-green-600 bg-green-50 border-green-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'high': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case "low":
+        return "text-green-600 bg-green-50 border-green-200";
+      case "medium":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      case "high":
+        return "text-red-600 bg-red-50 border-red-200";
+      default:
+        return "text-gray-600 bg-gray-50 border-gray-200";
     }
   };
-
+  // Helper to get badge color for noise level
+  const getNoiseBadgeColor = (level) => {
+    switch (level) {
+      case "High":
+        return "bg-red-500";
+      case "Moderate":
+        return "bg-yellow-500";
+      case "Low":
+        return "bg-green-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
   const aqiStatus = getAQIStatus(aqi_data.aqi);
 
   const handleShare = () => {
-    const shareText = `Environmental Report for ${location.address}:\n` +
+    const shareText =
+      `Environmental Report for ${location.address}:\n` +
       `AQI: ${aqi_data.aqi} (${aqiStatus.status})\n` +
       `Temperature: ${weather_data.temperature}°C\n` +
       `Humidity: ${weather_data.humidity}%\n` +
       `Wind: ${weather_data.wind_speed} km/h\n` +
       `Generated by EcoSphere`;
-    
+
     if (navigator.share) {
       navigator.share({
-        title: 'Environmental Report',
-        text: shareText
+        title: "Environmental Report",
+        text: shareText,
       });
     } else {
       navigator.clipboard.writeText(shareText);
-      toast.success('Report copied to clipboard!');
+      toast.success("Report copied to clipboard!");
     }
   };
-
+console.log("EnvironmentalReport data:", data);
   return (
     <div className="space-y-6" data-testid="environmental-report">
       {/* Header */}
@@ -92,7 +158,9 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
               className="flex items-center gap-2"
               data-testid="refresh-report-btn"
             >
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
           </div>
@@ -100,7 +168,9 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
       </Card>
 
       {/* AQI Section */}
-      <Card className={`report-card border-l-4 ${aqiStatus.borderColor} ${aqiStatus.bgColor}`}>
+      <Card
+        className={`report-card border-l-4 ${aqiStatus.borderColor} ${aqiStatus.bgColor}`}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <Activity className={`h-6 w-6 ${aqiStatus.textColor}`} />
@@ -110,19 +180,24 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-4xl font-bold text-gray-800">{aqi_data.aqi}</div>
+              <div className="text-4xl font-bold text-gray-800">
+                {aqi_data.aqi}
+              </div>
               <Badge className={`${aqiStatus.color} text-white mt-2`}>
                 {aqiStatus.status}
               </Badge>
             </div>
             <div className="text-right">
-              <Progress value={(aqi_data.aqi / 500) * 100} className="w-32 h-3" />
+              <Progress
+                value={(aqi_data.aqi / 500) * 100}
+                className="w-32 h-3"
+              />
               <p className="text-sm text-gray-600 mt-1">Max: 500</p>
             </div>
           </div>
-          
+
           <Separator />
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="text-center">
               <p className="text-sm text-gray-600">PM2.5</p>
@@ -159,7 +234,10 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
               </h4>
               <div className="grid grid-cols-3 gap-2">
                 {aqi_data.forecast.map((day, index) => (
-                  <div key={index} className="text-center p-3 bg-white rounded-lg border">
+                  <div
+                    key={index}
+                    className="text-center p-3 bg-white rounded-lg border"
+                  >
                     <p className="text-xs text-gray-600">{day.day}</p>
                     <p className="text-lg font-bold">{day.aqi}</p>
                     <p className="text-xs text-gray-500">{day.status}</p>
@@ -183,33 +261,43 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg">
               <Thermometer className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-800">{weather_data.temperature}°C</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {weather_data.temperature}°C
+              </p>
               <p className="text-sm text-gray-600">Temperature</p>
             </div>
-            
+
             <div className="text-center p-4 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-lg">
               <Droplets className="h-8 w-8 text-cyan-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-800">{weather_data.humidity}%</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {weather_data.humidity}%
+              </p>
               <p className="text-sm text-gray-600">Humidity</p>
             </div>
-            
+
             <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
               <Wind className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-800">{weather_data.wind_speed}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {weather_data.wind_speed}
+              </p>
               <p className="text-sm text-gray-600">Wind km/h</p>
             </div>
-            
+
             <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg">
               <Eye className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-800">{weather_data.visibility}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {weather_data.visibility}
+              </p>
               <p className="text-sm text-gray-600">Visibility km</p>
             </div>
           </div>
-          
+
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <span className="text-sm text-gray-600">Wind Direction</span>
-              <span className="font-semibold">{weather_data.wind_direction}°</span>
+              <span className="font-semibold">
+                {weather_data.wind_direction}°
+              </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <span className="text-sm text-gray-600">Pressure</span>
@@ -221,7 +309,6 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
 
       {/* Additional Environmental Factors */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Noise Level */}
         <Card className="report-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -230,19 +317,28 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-800">{noise_level} dB</div>
-              <Badge className={noise_level > 55 ? 'bg-red-500' : noise_level > 45 ? 'bg-yellow-500' : 'bg-green-500'}>
-                {noise_level > 55 ? 'High' : noise_level > 45 ? 'Moderate' : 'Low'}
-              </Badge>
-              <p className="text-sm text-gray-600 mt-2">
-                WHO recommends max 55 dB during day
+            {noise_data ? (
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-800">
+                  {noise_data.db_range}
+                </div>
+                <Badge
+                  className={`${getNoiseBadgeColor(
+                    noise_data.level
+                  )} text-white mt-1`}
+                >
+                  {noise_data.level}
+                </Badge>
+                <p className="text-sm text-gray-600 mt-2">{noise_data.desc}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center">
+                Noise data not available.
               </p>
-            </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Water Logging Risk */}
         <Card className="report-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -252,11 +348,15 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <Badge className={`text-lg px-4 py-2 ${getWaterRiskColor(water_logging_risk)}`}>
+              <Badge
+                className={`text-lg px-4 py-2 ${getWaterRiskColor(
+                  water_logging_risk
+                )}`}
+              >
                 {water_logging_risk.toUpperCase()} RISK
               </Badge>
               <p className="text-sm text-gray-600 mt-3">
-                Based on topography, drainage system, and historical data
+                Based on topography, drainage, and historical data
               </p>
             </div>
           </CardContent>
@@ -278,9 +378,14 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
           <CardContent>
             <ul className="space-y-3">
               {ai_suggestions.map((suggestion, index) => (
-                <li key={index} className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm">
+                <li
+                  key={index}
+                  className="flex items-start gap-3 p-3 bg-white rounded-lg shadow-sm"
+                >
                   <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-white text-sm font-bold">{index + 1}</span>
+                    <span className="text-white text-sm font-bold">
+                      {index + 1}
+                    </span>
                   </div>
                   <p className="text-gray-700">{suggestion}</p>
                 </li>
@@ -307,10 +412,22 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
                   <AlertDescription>
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium capitalize">{complaint.report_type.replace('_', ' ')}</p>
-                        <p className="text-sm text-gray-600 mt-1">{complaint.description}</p>
+                        <p className="font-medium capitalize">
+                          {complaint.report_type.replace("_", " ")}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {complaint.description}
+                        </p>
                       </div>
-                      <Badge variant={complaint.severity === 'high' ? 'destructive' : complaint.severity === 'medium' ? 'default' : 'secondary'}>
+                      <Badge
+                        variant={
+                          complaint.severity === "high"
+                            ? "destructive"
+                            : complaint.severity === "medium"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {complaint.severity}
                       </Badge>
                     </div>
@@ -324,14 +441,14 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <Button 
+        <Button
           onClick={handleShare}
           className="flex-1 bg-emerald-500 hover:bg-emerald-600"
           data-testid="share-report-btn"
         >
           Share Report
         </Button>
-        <Button 
+        <Button
           variant="outline"
           className="flex-1"
           onClick={() => window.print()}

@@ -2,8 +2,11 @@ import express from 'express';
 import { getEnvironmentalReport } from '../controllers/environmentalController.js';
 import { createCivicReport, getCivicReports } from '../controllers/civicReportController.js';
 import { chatWithAI } from '../controllers/chatController.js';
+import noiseRoute from './noise.js';
+import trafficRoute from '../services/tomtomNoise.js';
 
 const router = express.Router();
+
 
 router.get('/', (req, res) => {
   res.json({ message: "EcoSphere API - Environmental Monitoring System (ESM)" });
@@ -27,5 +30,8 @@ router.get('/water-logging-zones', (req, res) => {
     ];
     res.json({ prone_areas: proneAreas });
 });
+
+router.use('/noise', noiseRoute);
+router.use('/traffic', trafficRoute);
 
 export default router;

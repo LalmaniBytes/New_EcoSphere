@@ -1,5 +1,6 @@
 import express from "express";
 import { generateReply } from "../services/gemini.js";
+import axios from "axios";
 
 const noiseRoute = express.Router();
 const mockSamples = [];
@@ -109,7 +110,6 @@ noiseRoute.get("/ai", async (req, res) => {
   }
 });
 
-
 // GET /noise/current - Return latest noise sample (current noise level) + AI advice
 noiseRoute.get("/current", async (req, res) => {
   const location = req.query.location;
@@ -192,5 +192,6 @@ noiseRoute.get("/trends", async (req, res) => {
     res.status(500).json({ error: "Failed to generate AI explanation." });
   }
 });
+
 
 export default noiseRoute;
