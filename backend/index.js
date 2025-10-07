@@ -46,6 +46,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send("API is running");
 });
+app.get("/ping", (req, res) => {
+  res.send("Ping routed working !");
+});
 app.use("/api", apiRoutes);
 app.use("/news", newsRoute);
 app.use("/gemini", geminiRoute);
