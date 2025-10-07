@@ -21,7 +21,6 @@ const fetchAqiData = async (lat, lon) => {
   try {
     const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${process.env.WAQI_API_TOKEN}`;
     const response = await axios.get(url);
-
     if (response.data && response.data.status === "ok") {
       const aqiInfo = response.data.data;
       const iaqi = aqiInfo.iaqi || {};
@@ -51,15 +50,63 @@ const fetchAqiData = async (lat, lon) => {
   }
 };
 
+function estimateVisibility({ t, dew, h, pm10, w }) {
+  const dewSpread = t - dew;
+  let visibility;
+
+  if (dewSpread < 2 && h > 90) {
+    // Likely fog or heavy mist
+    visibility = 0.5 + dewSpread / 2; // in km
+  } else if (h > 80) {
+    visibility = 2 + dewSpread; // in km
+  } else {
+    visibility = 5 + dewSpread * 2; // in km
+  }
+
+  // Adjust for PM10
+  if (pm10 > 20) {
+    visibility *= 0.85; // reduce by 15%
+  }
+
+  // Adjust for very low wind (no dispersal)
+  if (w < 2) {
+    visibility *= 0.9;
+  }
+
+  return Math.max(0.2, visibility.toFixed(2)); // clamp to minimum 0.2 km
+}
+
+// Example usage
+const data = {
+  t: 21.1,
+  dew: 20,
+  h: 93.6,
+  pm10: 40,
+  w: 1,
+};
+
+
+
 const fetchWeatherData = async (lat, lon) => {
+  const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${process.env.WAQI_API_TOKEN}`;
+  const response = await axios.get(url);
+  console.log("Weather API response:", response.data.data.iaqi);
+  const visibility = estimateVisibility({
+    t: response.data.data?.iaqi.t?.v ?? 22.0,
+    dew: response.data.data?.iaqi.d?.v ?? 20.0, 
+    h: response.data.data?.iaqi.h?.v ?? 85,
+    pm10: response.data.data?.iaqi.pm10?.v ?? 25.0,
+    w: response.data.data?.iaqi.w?.v ?? 5.0,
+  });
+  console.log("Visibility :" , visibility)
   return {
-    temperature: 24.5,
-    humidity: 65,
-    wind_speed: 8.2,
-    wind_direction: 180,
-    pressure: 1013.2,
-    visibility: 10.0,
-  };
+  temperature: Math.round(response.data.data?.iaqi.t?.v ?? 22.0),
+  humidity: Math.round(response.data.data?.iaqi.h?.v ?? 85),
+  wind_speed: Math.round(response.data.data?.iaqi.w?.v ?? 5.0),
+  wind_direction: Math.round(response.data.data?.iaqi.wd?.v ?? 180),
+  pressure: Math.round(response.data.data?.iaqi.p?.v ?? 1013.2),
+  visibility: Math.round(visibility ?? 10.0), // in km
+};
 };
 
 const calculateWaterLoggingRisk = (lat, lon) => {
