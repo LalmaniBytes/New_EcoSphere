@@ -73,7 +73,7 @@ function estimateVisibility({ t, dew, h, pm10, w }) {
     visibility *= 0.9;
   }
 
-  return Math.max(0.2, visibility.toFixed(2)); // clamp to minimum 0.2 km
+  return Math.max(0.2, visibility.toFixed(2));
 }
 
 // Example usage
@@ -101,11 +101,11 @@ const fetchWeatherData = async (lat, lon) => {
   console.log("Visibility :" , visibility)
   return {
   temperature: Math.round(response.data.data?.iaqi.t?.v ?? 22.0),
-  humidity: Math.round(response.data.data?.iaqi.h?.v ?? 85),
-  wind_speed: Math.round(response.data.data?.iaqi.w?.v ?? 5.0),
-  wind_direction: Math.round(response.data.data?.iaqi.wd?.v ?? 180),
-  pressure: Math.round(response.data.data?.iaqi.p?.v ?? 1013.2),
-  visibility: Math.round(visibility ?? 10.0), // in km
+  humidity: Number(response.data.data?.iaqi.h?.v ?? 85).toFixed(1),
+  wind_speed: Number(response.data.data?.iaqi.w?.v ?? 5.0).toFixed(1),
+  wind_direction: Number(response.data.data?.iaqi?.wd?.v ?? 180).toFixed(1),
+  pressure: Number(response.data.data?.iaqi.p?.v ?? 1013.2).toFixed(1),
+  visibility: Number(visibility ?? 10.0).toFixed(1), // in km
 };
 };
 
