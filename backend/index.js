@@ -2,6 +2,7 @@ import express from "express";
 import env from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
+import session from "express-session";
 import mongoose from "mongoose";
 import newsRoute from "./routes/news.js";
 import geminiRoute from "./routes/geminiRoute.js";
@@ -13,6 +14,15 @@ import apiRoutes from "./routes/api.js";
 const app = express();
 const PORT = process.env.PORT || 5050;
 env.config();
+
+app.use(
+  session({
+    secret: "supersecretkey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+  })
+);
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -27,19 +37,20 @@ const allowedOrigins = process.env.CORS_ORIGINS
   : [];
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("❌ Blocked by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true,
 };
-
-console.log("Allowed origins:", allowedOrigins);
-
 app.use(cors(corsOptions));
-
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false, // disable COEP for dev
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

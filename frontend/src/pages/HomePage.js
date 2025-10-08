@@ -66,7 +66,6 @@ const HomePage = ({
         ehs_score : response.data?.environmental_health_score,
       };
       setEnvironmentalData(combinedData);
-      // setEnvironmentalData(response.data);
       setShowReport(true);
       toast.success("Environmental data loaded successfully!");
     } catch (error) {
@@ -79,7 +78,6 @@ const HomePage = ({
 
   const handleLocationSelect = async (location) => {
     try {
-      // 1. Get the real address from the coordinates first
       const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
       const { data } = await axios.get(geoUrl);
       const address =
