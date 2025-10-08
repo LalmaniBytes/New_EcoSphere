@@ -8,31 +8,31 @@ export const mentalHealthCategories = [
       {
         id: 'cs-1',
         title: 'Deep Breathing Meditation',
-        duration: '10:30',
+        duration: '05:25',
         audioUrl: '/audio/breathing.mp3'
       },
       {
         id: 'cs-2',
         title: 'Progressive Muscle Relaxation',
-        duration: '15:45',
+        duration: '31:18',
         audioUrl: '/audio/muscle-relax.mp3'
       },
       {
         id: 'cs-3',
         title: 'Anxiety Release Soundscape',
-        duration: '20:00',
+        duration: '02:00',
         audioUrl: '/audio/anxiety-release.mp3'
       },
       {
         id: 'cs-4',
         title: 'Calm Mind Affirmations',
-        duration: '12:15',
+        duration: '02:00',
         audioUrl: '/audio/affirmations.mp3'
       },
       {
         id: 'cs-5',
         title: 'Stress Relief Binaural Beats',
-        duration: '25:00',
+        duration: '02:00',
         audioUrl: '/audio/binaural.mp3'
       }
     ]

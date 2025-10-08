@@ -1,8 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-import { Button } from './ui/button';
-import { Slider } from './ui/slider';
-import { Card } from './ui/card';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { Slider } from "./ui/slider";
+import { Card } from "./ui/card";
 
 const AudioPlayer = ({ tracks, categoryColor }) => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -12,37 +19,63 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
   const [volume, setVolume] = useState(70);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
-
+console.log("Ref" , audioRef)
   const currentTrack = tracks[currentTrackIndex];
 
-  // Simulate audio duration from mock data
+  // Update audio source when track changes
   useEffect(() => {
-    if (currentTrack && currentTrack.duration) {
-      const [minutes, seconds] = currentTrack.duration.split(':').map(Number);
-      setDuration((minutes * 60) + seconds);
+    if (audioRef.current) {
+      audioRef.current.src = currentTrack.audioUrl;
+      audioRef.current.load();
       setCurrentTime(0);
+      setDuration(0);
+      if (isPlaying) {
+        audioRef.current.play();
+      }
     }
+    console.log("currentTrack",audioRef.current.src );
+  }, [currentTrack]);
+  
+  useEffect(() => {
+    if (isPlaying) {
+      // Adding a .catch() is good practice for play()
+      audioRef.current
+        ?.play()
+        .catch((e) => console.error("Audio play failed:", e));
+    } else {
+      audioRef.current?.pause();
+    }
+  }, [isPlaying]);
+  // Attach audio event listeners
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const setAudioDuration = () => setDuration(audio.duration);
+    const handleEnded = () => handleNext();
+
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", setAudioDuration);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", setAudioDuration);
+      audio.removeEventListener("ended", handleEnded);
+    };
   }, [currentTrack]);
 
-  // Simulate playback progress
-  useEffect(() => {
-    let interval;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setCurrentTime(prev => {
-          if (prev >= duration) {
-            handleNext();
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, duration]);
-
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
   };
 
   const handlePrevious = () => {
@@ -63,33 +96,45 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
   };
 
   const handleSeek = (value) => {
-    setCurrentTime(value[0]);
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0];
+      setCurrentTime(value[0]);
+    }
   };
 
   const handleVolumeChange = (value) => {
+    const vol = value[0] / 100;
+    if (audioRef.current) audioRef.current.volume = vol;
     setVolume(value[0]);
-    setIsMuted(value[0] === 0);
+    setIsMuted(vol === 0);
   };
 
   const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-
+console.log("currentTrack",currentTrack); 
+console.log("tracks",tracks);
   return (
     <div className="space-y-3">
+      <audio ref={audioRef} />
+
       {/* Track List */}
       <div className="space-y-2">
         {tracks.map((track, index) => (
           <Card
             key={track.id}
             className={`p-3 cursor-pointer transition-all duration-200 hover:shadow-md ${
-              index === currentTrackIndex ? 'border-2 border-primary bg-accent' : 'hover:bg-accent/50'
+              index === currentTrackIndex
+                ? "border-2 border-primary bg-accent"
+                : "hover:bg-accent/50"
             }`}
             onClick={() => {
               setCurrentTrackIndex(index);
@@ -98,9 +143,13 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  index === currentTrackIndex && isPlaying ? 'bg-primary text-white' : 'bg-muted'
-                }`}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    index === currentTrackIndex && isPlaying
+                      ? "bg-primary text-white"
+                      : "bg-muted"
+                  }`}
+                >
                   {index === currentTrackIndex && isPlaying ? (
                     <Pause className="w-4 h-4" />
                   ) : (
@@ -108,14 +157,18 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
                   )}
                 </div>
                 <div>
-                  <p className={`font-medium ${
-                    index === currentTrackIndex ? 'text-primary' : ''
-                  }`}>
+                  <p
+                    className={`font-medium ${
+                      index === currentTrackIndex ? "text-primary" : ""
+                    }`}
+                  >
                     {track.title}
                   </p>
                 </div>
               </div>
-              <span className="text-sm text-muted-foreground">{track.duration}</span>
+              <span className="text-sm text-muted-foreground">
+                {track.duration}
+              </span>
             </div>
           </Card>
         ))}
@@ -126,8 +179,12 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
         <div className="space-y-4">
           {/* Current Track Info */}
           <div>
-            <p className="font-semibold text-sm text-foreground">{currentTrack.title}</p>
-            <p className="text-xs text-muted-foreground">Track {currentTrackIndex + 1} of {tracks.length}</p>
+            <p className="font-semibold text-sm text-foreground">
+              {currentTrack.title}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Track {currentTrackIndex + 1} of {tracks.length}
+            </p>
           </div>
 
           {/* Progress Bar */}
@@ -162,7 +219,11 @@ const AudioPlayer = ({ tracks, categoryColor }) => {
                 onClick={togglePlay}
                 className="w-12 h-12 rounded-full transition-transform hover:scale-110"
               >
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                {isPlaying ? (
+                  <Pause className="w-6 h-6" />
+                ) : (
+                  <Play className="w-6 h-6" />
+                )}
               </Button>
               <Button
                 variant="ghost"
