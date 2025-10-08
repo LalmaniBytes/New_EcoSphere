@@ -1,5 +1,6 @@
 import axios from "axios";
 import CivicReport from "../models/civicReport.model.js";
+import { calculateEnvironmentalHealth } from "../services/ehsCalculator.js";
 
 const fetchAqiData = async (lat, lon) => {
   const fallbackData = {
@@ -85,28 +86,26 @@ const data = {
   w: 1,
 };
 
-
-
 const fetchWeatherData = async (lat, lon) => {
   const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${process.env.WAQI_API_TOKEN}`;
   const response = await axios.get(url);
   console.log("Weather API response:", response.data.data.iaqi);
   const visibility = estimateVisibility({
     t: response.data.data?.iaqi.t?.v ?? 22.0,
-    dew: response.data.data?.iaqi.d?.v ?? 20.0, 
+    dew: response.data.data?.iaqi.d?.v ?? 20.0,
     h: response.data.data?.iaqi.h?.v ?? 85,
     pm10: response.data.data?.iaqi.pm10?.v ?? 25.0,
     w: response.data.data?.iaqi.w?.v ?? 5.0,
   });
-  console.log("Visibility :" , visibility)
+  console.log("Visibility :", visibility);
   return {
-  temperature: Math.round(response.data.data?.iaqi.t?.v ?? 22.0),
-  humidity: Number(response.data.data?.iaqi.h?.v ?? 85).toFixed(1),
-  wind_speed: Number(response.data.data?.iaqi.w?.v ?? 5.0).toFixed(1),
-  wind_direction: Number(response.data.data?.iaqi?.wd?.v ?? 180).toFixed(1),
-  pressure: Number(response.data.data?.iaqi.p?.v ?? 1013.2).toFixed(1),
-  visibility: Number(visibility ?? 10.0).toFixed(1), // in km
-};
+    temperature: Math.round(response.data.data?.iaqi.t?.v ?? 22.0),
+    humidity: Number(response.data.data?.iaqi.h?.v ?? 85).toFixed(1),
+    wind_speed: Number(response.data.data?.iaqi.w?.v ?? 5.0).toFixed(1),
+    wind_direction: Number(response.data.data?.iaqi?.wd?.v ?? 180).toFixed(1),
+    pressure: Number(response.data.data?.iaqi.p?.v ?? 1013.2).toFixed(1),
+    visibility: Number(visibility ?? 10.0).toFixed(1), // in km
+  };
 };
 
 const calculateWaterLoggingRisk = (lat, lon) => {
@@ -167,21 +166,29 @@ export const getEnvironmentalReport = async (req, res) => {
         .json({ message: "Latitude and longitude are required." });
     }
 
-    const [aqiData, weatherData, nearbyComplaints] = await Promise.all([
-      fetchAqiData(latitude, longitude),
-      fetchWeatherData(latitude, longitude),
-      CivicReport.find({
-        "location.latitude": { $gte: latitude - 0.01, $lte: latitude + 0.01 },
-        "location.longitude": {
-          $gte: longitude - 0.01,
-          $lte: longitude + 0.01,
-        },
-        status: "active",
-      })
-        .limit(10)
-        .lean(),
-    ]);
-
+    const [aqiData, weatherData, trafficData, nearbyComplaints] =
+      await Promise.all([
+        fetchAqiData(latitude, longitude),
+        fetchWeatherData(latitude, longitude),
+        CivicReport.find({
+          "location.latitude": { $gte: latitude - 0.01, $lte: latitude + 0.01 },
+          "location.longitude": {
+            $gte: longitude - 0.01,
+            $lte: longitude + 0.01,
+          },
+          status: "active",
+        })
+          .limit(10)
+          .lean(),
+      ]);
+    const ehs = calculateEnvironmentalHealth({
+      aqi: aqiData.aqi,
+      temperature: weatherData.temperature,
+      humidity: weatherData.humidity,
+      windSpeed: weatherData.wind_speed, // Assuming wind_speed is in m/s
+      congestionScore: trafficData.congestionScore,
+    });
+    console.log("Calculated EHS:", ehs);
     const waterLoggingRisk = calculateWaterLoggingRisk(latitude, longitude);
     const aiSuggestions = await getAiSuggestions({
       aqi: aqiData.aqi,
@@ -197,6 +204,7 @@ export const getEnvironmentalReport = async (req, res) => {
       water_logging_risk: waterLoggingRisk,
       civic_complaints: nearbyComplaints,
       ai_suggestions: aiSuggestions,
+      // environmental_health_score: ehs,
       timestamp: new Date(),
     };
 
