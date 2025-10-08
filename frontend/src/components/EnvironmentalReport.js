@@ -131,41 +131,90 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
       toast.success("Report copied to clipboard!");
     }
   };
-console.log("EnvironmentalReport data:", data);
+  console.log("EnvironmentalReport data:", data);
   return (
     <div className="space-y-6" data-testid="environmental-report">
       {/* Header */}
-      <Card className="report-card">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-                  🌍
-                </div>
-                Environmental Report Card
-              </CardTitle>
-              <p className="text-gray-600 mt-1 flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {location.address}
-              </p>
-            </div>
-            <Button
-              onClick={onRefresh}
-              disabled={loading}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              data-testid="refresh-report-btn"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
+
+      <Card className="shadow-md border border-emerald-100 p-4 rounded-lg">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            🌿 Environmental Report Card
+          </h2>
+          <Button
+            variant="outline"
+            onClick={onRefresh}
+            disabled={loading}
+            className="flex items-center gap-2 mt-2 sm:mt-0"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Summary Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+          <div className="bg-green-50 rounded-lg p-4 text-center">
+            <Badge variant="outline" className="mb-1">
+              EHS
+            </Badge>
+            <p className="text-2xl font-bold text-green-600">
+              {/* {data.health_data?.health} */}
+              82
+            </p>
+            <p className="text-sm text-gray-600"> environmental health score
+            </p>
           </div>
-        </CardHeader>
+
+
+          {/* AQI */}
+          <div className="bg-green-50 rounded-lg p-4 text-center">
+            <Badge variant="outline" className="mb-1">
+              AQI
+            </Badge>
+            <p className="text-2xl font-bold text-green-600">
+              {data.aqi_data?.aqi}
+            </p>
+            <p className="text-sm text-gray-600">Air Quality Index</p>
+          </div>
+
+          {/* Pollution Index */}
+          <div className="bg-emerald-50 rounded-lg p-4 text-center">
+            <Wind className="h-6 w-6 text-emerald-600 mx-auto mb-1" />
+            <p className="text-2xl font-bold">{data.aqi_data?.pm25}</p>
+            <p className="text-sm text-gray-600">Pollution Index</p>
+          </div>
+
+          {/* Noise Level */}
+          {data.noise_data && (
+            <div className="bg-blue-50 rounded-lg p-4 text-center">
+              <Droplets className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+              <p className="text-2xl font-bold">{data.noise_data.db_range} </p>
+              <p className="text-sm text-gray-600">Noise Level</p>
+            </div>
+          )}
+        </div>
+
+        {/* AI Insights */}
+        {data.ai_suggestions && data.ai_suggestions.length > 0 && (
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-2">AI Insights</h4>
+            <ul className="space-y-2">
+              {data.ai_suggestions.map((tip, index) => (
+                <li
+                  key={index}
+                  className="flex items-start gap-2 text-gray-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100"
+                >
+                  <span className="text-emerald-600 mt-0.5">✔️</span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Card>
+
 
       {/* AQI Section */}
       <Card
@@ -424,8 +473,8 @@ console.log("EnvironmentalReport data:", data);
                           complaint.severity === "high"
                             ? "destructive"
                             : complaint.severity === "medium"
-                            ? "default"
-                            : "secondary"
+                              ? "default"
+                              : "secondary"
                         }
                       >
                         {complaint.severity}
