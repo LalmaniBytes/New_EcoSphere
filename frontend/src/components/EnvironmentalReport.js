@@ -22,6 +22,60 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+const CircularEHS = ({ value }) => {
+  const radius = 50;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (value / 100) * circumference;
+
+  // Dynamic color based on score
+  const getColor = (v) => {
+    if (v >= 80) return "stroke-green-500 text-green-500";
+    if (v >= 60) return "stroke-yellow-500 text-yellow-500";
+    if (v >= 40) return "stroke-orange-500 text-orange-500";
+    return "stroke-red-500 text-red-500";
+  };
+
+  return (
+    <div className="relative w-[120px] h-[120px] flex items-center justify-center">
+      <svg
+        className="transform -rotate-90"
+        width="120"
+        height="120"
+        viewBox="0 0 120 120"
+      >
+        {/* Background circle */}
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          stroke="#e5e7eb"
+          strokeWidth="10"
+          fill="none"
+        />
+        {/* Foreground progress circle */}
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          className={getColor(value)}
+          strokeWidth="10"
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 1s ease" }}
+        />
+      </svg>
+
+      {/* Text inside circle */}
+      <div className="absolute text-center">
+        <p className="text-2xl font-bold text-gray-800">{value}%</p>
+        <p className="text-sm text-gray-500">EHS Score</p>
+      </div>
+    </div>
+  );
+};
+
 const EnvironmentalReport = ({ data, onRefresh, loading }) => {
   if (!data) return null;
 
@@ -158,54 +212,54 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
         <p className="text-gray-600 mt-1 flex items-center gap-1">
           <MapPin className="h-4 w-4" />
           {location.address}
-        </p> 
+        </p>
 
         {/* Summary Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-          {/* EHS Score */}
-          <div className="bg-green-50 rounded-lg p-4 text-center">
-            <Badge variant="outline" className="mb-1">
-              EHS
-            </Badge>
-            <p className="text-2xl font-bold text-green-600">
-              {/* Use the score from the ehs_score object */}
-              {data.ehs_score?.score || "N/A"}
-            </p>
-            <p className="text-sm text-gray-600">Environmental Health</p>
+        <div className="space-y-6 mb-4">
+          {/* Row 1: Centered EHS */}
+          <div className="flex justify-center">
+            <Card className="bg-green-100 text-center card-hover relative w-[160px]">
+              <CardContent className="p-4 flex flex-col items-center justify-center">
+                <CircularEHS value={Math.round(data.ehs_score?.score || 0)} />
+              </CardContent>
+            </Card>
           </div>
 
-          {/* AQI */}
-          <div className="bg-yellow-50 rounded-lg p-4 text-center">
-            <Badge variant="outline" className="mb-1">
-              AQI
-            </Badge>
-            <p className="text-2xl font-bold text-yellow-700">
-              {data.ehs_score?.breakdown?.airScore || "N/A"}
-            </p>
-            <p className="text-sm text-gray-600">AQI score</p>
-          </div>
-
-          {/* Pollution Index (PM2.5) */}
-          <div className="bg-orange-50 rounded-lg p-4 text-center">
-            <Wind className="h-6 w-6 text-orange-600 mx-auto mb-1" />
-            <p className="text-2xl font-bold text-orange-700">
-              {data.ehs_score?.breakdown?.weatherScore|| "N/A"}
-            </p>
-            <p className="text-sm text-gray-600">Weather score</p>
-          </div>
-
-          {/* Noise Level */}
-          {data.ehs_score?.breakdown?.noiseScore && (
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <Volume2 className="h-6 w-6 text-blue-600 mx-auto mb-1" />
-              <p className="text-2xl font-bold text-blue-700">
-                {/* Use the estimatedDb from the EHS breakdown */}
-                {data.ehs_score.breakdown.noiseScore} 
+          {/* Row 2: AQI, Weather, Noise */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {/* AQI */}
+            <div className="bg-yellow-100 rounded-lg p-4 text-center flex flex-col items-center justify-center">
+              <Badge variant="outline" className="mb-1">
+                AQI
+              </Badge>
+              <p className="text-2xl font-bold text-yellow-700">
+                {data.ehs_score?.breakdown?.airScore || "N/A"}
               </p>
-              <p className="text-sm text-gray-600">Est. Noise Level</p>
+              <p className="text-sm text-gray-600">AQI score</p>
             </div>
-          )}
+
+            {/* Weather */}
+            <div className="bg-orange-100 rounded-lg p-4 text-center flex flex-col items-center justify-center">
+              <Wind className="h-6 w-6 text-orange-600 mx-auto mb-1" />
+              <p className="text-2xl font-bold text-orange-700">
+                {data.ehs_score?.breakdown?.weatherScore || "N/A"}
+              </p>
+              <p className="text-sm text-gray-600">Weather score</p>
+            </div>
+
+            {/* Noise */}
+            {data.ehs_score?.breakdown?.noiseScore && (
+              <div className="bg-blue-100 rounded-lg p-4 text-center flex flex-col items-center justify-center">
+                <Volume2 className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+                <p className="text-2xl font-bold text-blue-700">
+                  {data.ehs_score.breakdown.noiseScore}
+                </p>
+                <p className="text-sm text-gray-600">Est. Noise Level</p>
+              </div>
+            )}
+          </div>
         </div>
+
 
         {/* AI Insights */}
         {data.ai_suggestions && data.ai_suggestions.length > 0 && (
