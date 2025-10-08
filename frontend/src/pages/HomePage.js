@@ -189,7 +189,7 @@ const HomePage = ({
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-              <span className="gradient-text">Eco</span>Sphere
+              <span className="gradient-text">Eco</span>Sphere &#x1F30D;
             </h1>
             <p className="text-xl md:text-2xl text-emerald-100 mb-8 max-w-3xl mx-auto animate-slide-up">
               Your comprehensive environmental monitoring platform. Get
