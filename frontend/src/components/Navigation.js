@@ -63,33 +63,44 @@ const Navigation = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            {[
-              { to: "/", label: "Home", icon: <MapPin className="h-4 w-4" /> },
-              {
-                to: "/report",
-                label: "Report Issue",
-                icon: <FileText className="h-4 w-4" />,
-              },
-              {
-                to: "/chat",
-                label: "AI Assistant",
-                icon: <MessageCircle className="h-4 w-4" />,
-              },
-            ].map(({ to, label, icon }) => (
-              <Link key={to} to={to}>
-                <Button
-                  variant={isActive(to) ? "default" : "ghost"}
-                  className={`flex items-center space-x-2 ${
-                    isActive(to)
-                      ? "bg-emerald-500 hover:bg-emerald-600"
-                      : "hover:bg-emerald-50"
-                  }`}
-                >
-                  {icon}
-                  <span>{label}</span>
-                </Button>
-              </Link>
-            ))}
+            <Link to="/">
+              <Button
+                variant={isActive('/') ? 'default' : 'ghost'}
+                className={`flex items-center space-x-2 ${
+                  isActive('/') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                }`}
+                data-testid="nav-home-btn"
+              >
+                <MapPin className="h-4 w-4" />
+                <span>Home</span>
+              </Button>
+            </Link>
+
+            <Link to="/report">
+              <Button
+                variant={isActive('/report') ? 'default' : 'ghost'}
+                className={`flex items-center space-x-2 ${
+                  isActive('/report') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                }`}
+                data-testid="nav-report-btn"
+              >
+                <FileText className="h-4 w-4" />
+                <span>Report Issue</span>
+              </Button>
+            </Link>
+
+            <Link to="/chat">
+              <Button
+                variant={isActive('/chat') ? 'default' : 'ghost'}
+                className={`flex items-center space-x-2 ${
+                  isActive('/chat') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                }`}
+                data-testid="nav-chat-btn"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>AI Assistant</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Auth Buttons */}

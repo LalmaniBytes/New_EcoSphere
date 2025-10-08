@@ -4,6 +4,8 @@ import axios from 'axios';
 import HomePage from './pages/HomePage';
 import ReportPage from './pages/ReportPage';
 import ChatPage from './pages/ChatPage';
+import JoinHands from './pages/joinhands';
+import ChatWidget from './pages/chatwidget';
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
 import '@/App.css';
@@ -82,12 +84,23 @@ function App() {
             element={
               <NoiseWidget />} 
           />
+          <Route 
+            path="/joinhands" 
+            element={
+              <JoinHands/>} 
+          />
+          
+          
         </Routes>
+        {/* Floating Chat Widget */}
+        <ChatWidget currentLocation={currentLocation} />
+
         
         <Toaster position="top-right" />
       </div>
     </Router>
   );
 }
+
 
 export default App;
