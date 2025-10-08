@@ -65,7 +65,7 @@ const HomePage = ({
         location: location,
         traffic_data: trafficResponse.data.traffic,
         noise_data: trafficResponse.data.noise,
-        ehs_score : response.data?.environmental_health_score,
+        ehs_score: response.data?.environmental_health_score,
       };
       setEnvironmentalData(combinedData);
       // setEnvironmentalData(response.data);
@@ -260,7 +260,7 @@ const HomePage = ({
 
             {/* Quick Stats */}
             {environmentalData && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Activity className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
@@ -302,6 +302,99 @@ const HomePage = ({
                 </Card>
               </div>
             )}
+            {/* Environmental Data Section Below Map */}
+            {environmentalData && (
+              <div className="grid grid-rows-2 gap-2"> {/* reduced gap from 4 -> 2 and removed mt-10 */}
+                {/* Row 1: Weather (full width) */}
+                <div className="row-span-1">
+                  <Card className="text-center card-hover">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-4 justify-center">
+                        <Thermometer className="h-5 w-5 text-orange-500" />
+                        Weather
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col md:flex-row justify-around items-center gap-6">
+                        <div>
+                          <p className="text-gray-600">Temperature</p>
+                          <p className="text-2xl font-bold">
+                            {environmentalData.weather_data.temperature}°C
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Humidity</p>
+                          <p className="text-2xl font-bold">
+                            {environmentalData.weather_data.humidity}%
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Wind Speed</p>
+                          <p className="text-2xl font-bold">
+                            {environmentalData.weather_data.wind_speed} km/h
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Row 2: Noise Pollution and Water Logging Risk */}
+                <div className="row-span-1 grid grid-cols-1 md:grid-cols-2 gap-4"> {/* reduced gap from 6 -> 4 */}
+                  {/* Noise Pollution */}
+                  <Card className="text-center card-hover">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 justify-center">
+                        <Wind className="h-5 w-5 text-purple-500" />
+                        Noise Pollution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {environmentalData.noise_data ? (
+                        <div className="flex flex-col gap-2">
+                          <p className="text-gray-600">Level</p>
+                          <Badge className="bg-purple-500 text-white">
+                            {environmentalData.noise_data.level}
+                          </Badge>
+                          <p className="text-gray-600">dB Range</p>
+                          <p className="text-2xl font-bold">
+                            {environmentalData.noise_data.db_range}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">Noise data not available</p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Water Logging Risk */}
+                  <Card className="text-center card-hover">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 justify-center">
+                        <Droplets className="h-5 w-5 text-blue-500" />
+                        Water Logging Risk
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Badge
+                        className={`text-lg px-4 py-2 ${environmentalData.water_logging_risk === "low"
+                          ? "bg-green-100 text-green-700"
+                          : environmentalData.water_logging_risk === "medium"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                          }`}
+                      >
+                        {environmentalData.water_logging_risk?.toUpperCase() || "N/A"} RISK
+                      </Badge>
+                      <p className="text-gray-600 mt-2 text-sm">
+                        Based on topography, drainage, and historical data
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
           </div>
 
           {/* Environmental Report Section */}
