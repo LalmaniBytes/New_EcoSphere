@@ -66,10 +66,9 @@ function estimateVisibility({ t, dew, h, pm10, w }) {
 
   // Adjust for PM10
   if (pm10 > 20) {
-    visibility *= 0.85; // reduce by 15%
+    visibility *= 0.85;
   }
 
-  // Adjust for very low wind (no dispersal)
   if (w < 2) {
     visibility *= 0.9;
   }
