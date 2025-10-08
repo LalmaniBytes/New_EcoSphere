@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ChatPage from "./ChatPage";
+import { X } from "lucide-react";
 
 
 const ChatWidget = ({ currentLocation }) => {

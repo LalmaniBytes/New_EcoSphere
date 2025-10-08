@@ -107,7 +107,23 @@ const Navigation = () => {
                 <Handshake className="h-4 w-4" />
                 <span>Join Hands</span>
               </Button>
+
             </Link>
+            <Link to="/mentalhealth">
+              <Button
+                variant={isActive("/mentalhealth") ? "default" : "ghost"}
+                className={`flex items-center space-x-2 ${
+                  isActive("/mentalhealth")
+                    ? "bg-emerald-500 hover:bg-emerald-600"
+                    : "hover:bg-emerald-50"
+                }`}
+                data-testid="nav-mentalhealth-btn"
+              >
+               
+                <span>🎶Vibe Cure</span>
+              </Button>
+            </Link>
+
           </div>
 
           {/* Auth Buttons */}
