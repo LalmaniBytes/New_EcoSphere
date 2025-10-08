@@ -24,8 +24,6 @@ import EnvironmentalReport from "../components/EnvironmentalReport";
 import axios from "axios";
 import { add } from "date-fns";
 
-
-
 const HomePage = ({
   currentLocation,
   setCurrentLocation,
@@ -80,6 +78,7 @@ const HomePage = ({
   };
 
   const handleLocationSelect = async (location) => {
+    setLoading(true);
     try {
       // 1. Get the real address from the coordinates first
       const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
@@ -185,6 +184,44 @@ const HomePage = ({
   return (
     <div className="min-h-screen pt-16">
       {/* Hero Section */}
+      {loading && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-b from-emerald-800 via-teal-900 to-blue-950 backdrop-blur-md">
+          <div className="flex flex-col items-center text-center animate-fade-in">
+            {/* Animated Spinner Ring */}
+            <div className="relative w-20 h-20 mb-6">
+              <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-emerald-400 animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-2 border-emerald-300 opacity-40"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-4xl animate-pulse">🌍</span>
+              </div>
+            </div>
+
+            {/* Text Section */}
+            <h2 className="text-3xl font-semibold text-white drop-shadow-md mb-2">
+              Fetching Environmental Insights
+            </h2>
+            <p className="text-emerald-200 text-sm md:text-base max-w-md px-6 leading-relaxed">
+              Gathering real-time air quality, weather patterns, and
+              sustainability data for your selected location...
+            </p>
+
+            {/* Animated Glow Bar */}
+            <div className="w-48 h-1 bg-emerald-500/40 rounded-full mt-6 overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300 to-transparent animate-[shine_2s_linear_infinite]" />
+            </div>
+          </div>
+
+          {/* Custom animation for glow bar */}
+          <style>
+            {`
+        @keyframes shine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}
+          </style>
+        </div>
+      )}
       <div className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-blue-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
@@ -304,7 +341,9 @@ const HomePage = ({
             )}
             {/* Environmental Data Section Below Map */}
             {environmentalData && (
-              <div className="grid grid-rows-2 gap-2"> {/* reduced gap from 4 -> 2 and removed mt-10 */}
+              <div className="grid grid-rows-2 gap-2">
+                {" "}
+                {/* reduced gap from 4 -> 2 and removed mt-10 */}
                 {/* Row 1: Weather (full width) */}
                 <div className="row-span-1">
                   <Card className="text-center card-hover">
@@ -338,9 +377,10 @@ const HomePage = ({
                     </CardContent>
                   </Card>
                 </div>
-
                 {/* Row 2: Noise Pollution and Water Logging Risk */}
-                <div className="row-span-1 grid grid-cols-1 md:grid-cols-2 gap-4"> {/* reduced gap from 6 -> 4 */}
+                <div className="row-span-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {" "}
+                  {/* reduced gap from 6 -> 4 */}
                   {/* Noise Pollution */}
                   <Card className="text-center card-hover">
                     <CardHeader>
@@ -362,11 +402,12 @@ const HomePage = ({
                           </p>
                         </div>
                       ) : (
-                        <p className="text-gray-500">Noise data not available</p>
+                        <p className="text-gray-500">
+                          Noise data not available
+                        </p>
                       )}
                     </CardContent>
                   </Card>
-
                   {/* Water Logging Risk */}
                   <Card className="text-center card-hover">
                     <CardHeader>
@@ -377,14 +418,17 @@ const HomePage = ({
                     </CardHeader>
                     <CardContent>
                       <Badge
-                        className={`text-lg px-4 py-2 ${environmentalData.water_logging_risk === "low"
-                          ? "bg-green-100 text-green-700"
-                          : environmentalData.water_logging_risk === "medium"
+                        className={`text-lg px-4 py-2 ${
+                          environmentalData.water_logging_risk === "low"
+                            ? "bg-green-100 text-green-700"
+                            : environmentalData.water_logging_risk === "medium"
                             ? "bg-yellow-100 text-yellow-700"
                             : "bg-red-100 text-red-700"
-                          }`}
+                        }`}
                       >
-                        {environmentalData.water_logging_risk?.toUpperCase() || "N/A"} RISK
+                        {environmentalData.water_logging_risk?.toUpperCase() ||
+                          "N/A"}{" "}
+                        RISK
                       </Badge>
                       <p className="text-gray-600 mt-2 text-sm">
                         Based on topography, drainage, and historical data
@@ -394,7 +438,6 @@ const HomePage = ({
                 </div>
               </div>
             )}
-
           </div>
 
           {/* Environmental Report Section */}
