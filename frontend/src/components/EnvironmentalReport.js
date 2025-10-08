@@ -180,27 +180,27 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
               AQI
             </Badge>
             <p className="text-2xl font-bold text-yellow-700">
-              {data.aqi_data?.aqi || "N/A"}
+              {data.ehs_score?.breakdown?.airScore || "N/A"}
             </p>
-            <p className="text-sm text-gray-600">Air Quality Index</p>
+            <p className="text-sm text-gray-600">AQI score</p>
           </div>
 
           {/* Pollution Index (PM2.5) */}
           <div className="bg-orange-50 rounded-lg p-4 text-center">
             <Wind className="h-6 w-6 text-orange-600 mx-auto mb-1" />
             <p className="text-2xl font-bold text-orange-700">
-              {data.aqi_data?.pm25 || "N/A"}
+              {data.ehs_score?.breakdown?.weatherScore|| "N/A"}
             </p>
-            <p className="text-sm text-gray-600">PM2.5 (μg/m³)</p>
+            <p className="text-sm text-gray-600">Weather score</p>
           </div>
 
           {/* Noise Level */}
-          {data.ehs_score?.breakdown?.estimatedDb && (
+          {data.ehs_score?.breakdown?.noiseScore && (
             <div className="bg-blue-50 rounded-lg p-4 text-center">
               <Volume2 className="h-6 w-6 text-blue-600 mx-auto mb-1" />
               <p className="text-2xl font-bold text-blue-700">
                 {/* Use the estimatedDb from the EHS breakdown */}
-                {data.ehs_score.breakdown.estimatedDb} dB
+                {data.ehs_score.breakdown.noiseScore} 
               </p>
               <p className="text-sm text-gray-600">Est. Noise Level</p>
             </div>
