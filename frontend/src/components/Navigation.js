@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { MapPin, MessageCircle, FileText, User, LogIn, UserPlus, Menu, X } from 'lucide-react';
+import { MapPin, FileText, User, LogIn, UserPlus, Menu, X } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -51,16 +51,16 @@ const Navigation = () => {
               </Button>
             </Link>
 
-            <Link to="/chat">
+            <Link to="/joinhands">
               <Button
-                variant={isActive('/chat') ? 'default' : 'ghost'}
+                variant={isActive('/joinhands') ? 'default' : 'ghost'}
                 className={`flex items-center space-x-2 ${
-                  isActive('/chat') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                  isActive('/joinhands') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
                 }`}
-                data-testid="nav-chat-btn"
+                data-testid="nav-joinhands-btn"
               >
-                <MessageCircle className="h-4 w-4" />
-                <span>AI Assistant</span>
+               
+                <span> 🤝 Join Hands </span>
               </Button>
             </Link>
           </div>
