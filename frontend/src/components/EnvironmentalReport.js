@@ -158,7 +158,7 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
         <p className="text-gray-600 mt-1 flex items-center gap-1">
           <MapPin className="h-4 w-4" />
           {location.address}
-        </p>
+        </p> 
 
         {/* Summary Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
