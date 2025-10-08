@@ -6,6 +6,7 @@ import ReportPage from './pages/ReportPage';
 import ChatPage from './pages/ChatPage';
 import JoinHands from './pages/joinhands';
 import ChatWidget from './pages/chatwidget';
+import Footer from './components/footer';
 
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
@@ -101,7 +102,7 @@ function App() {
         {/* Floating Chat Widget */}
         <ChatWidget currentLocation={currentLocation} />
 
-        
+        <Footer/>
         <Toaster position="top-right" />
       </div>
     </Router>
