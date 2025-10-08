@@ -1,5 +1,5 @@
 import CivicReport from "../models/civicReport.model.js";
-import axios from "axios";  
+import axios from "axios";
 
 export const createCivicReport = async (req, res) => {
   try {
@@ -16,7 +16,11 @@ export const createCivicReport = async (req, res) => {
     try {
       // 3. Perform reverse geocoding using Nominatim
       const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
-      const { data } = await axios.get(geoUrl);
+      const { data } = await axios.get(geoUrl, {
+  headers: {
+    'User-Agent': 'your-app-name/1.0'  // 🔥 Must add this! Nominatim requires it
+  }
+});
       console.log("Nominatim geocoding response:", data);
       if (data && data.display_name) {
         console.log("Geocoded address:", data);

@@ -84,7 +84,7 @@ const ReportPage = ({ currentLocation, setCurrentLocation }) => {
   useEffect(() => {
     fetchRecentReports();
   }, []);
-
+  console.log("Current Location in ReportPage:", currentLocation);
   // Set location when currentLocation changes
   useEffect(() => {
     if (currentLocation) {
@@ -107,8 +107,9 @@ const ReportPage = ({ currentLocation, setCurrentLocation }) => {
   const handleLocationSelect = async (location) => {
     setIsGeocoding(true); // Start loading
     try {
-      const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
+      const geoUrl = `/geocode/reverse?lat=${location.latitude}&lon=${location.longitude}`;
       const { data } = await axios.get(geoUrl);
+      console.log("Geocoding response:", data);
       const address =
         data.display_name ||
         `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
@@ -198,7 +199,7 @@ const ReportPage = ({ currentLocation, setCurrentLocation }) => {
     if (currentLocation && !formData.location) {
       handleLocationSelect(currentLocation);
     }
-  }, [currentLocation, formData.location]);
+  }, [currentLocation, formData.location, handleLocationSelect]);
   return (
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4">
