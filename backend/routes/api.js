@@ -1,9 +1,10 @@
 import express from 'express';
 import { getEnvironmentalReport } from '../controllers/environmentalController.js';
-import { createCivicReport, getCivicReports } from '../controllers/civicReportController.js';
+// import { createCivicReport, getCivicReports } from '../controllers/civicReportController.js';
 import { chatWithAI } from '../controllers/chatController.js';
 import noiseRoute from './noise.js';
 import trafficRoute from '../services/tomtomNoise.js';
+import { reverseGeocode , createCivicReport , getCivicReports} from '../controllers/civicReport.controller.js';
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/environmental-report', getEnvironmentalReport);
-
+router.get("/geocode/reverse", reverseGeocode);
 router.post('/civic-reports', createCivicReport);
 router.get('/civic-reports', getCivicReports);
 
