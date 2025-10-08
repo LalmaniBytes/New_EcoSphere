@@ -11,6 +11,7 @@ import {
   UserPlus,
   Menu,
   X,
+  Handshake
 } from "lucide-react";
 
 const Navigation = () => {
@@ -93,18 +94,18 @@ const Navigation = () => {
               </Button>
             </Link>
 
-            <Link to="/chat">
+            <Link to="/joinhands">
               <Button
                 variant={isActive("/chat") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
-                  isActive("/chat")
+                  isActive("/joinhands")
                     ? "bg-emerald-500 hover:bg-emerald-600"
                     : "hover:bg-emerald-50"
                 }`}
                 data-testid="nav-chat-btn"
               >
-                <MessageCircle className="h-4 w-4" />
-                <span>AI Assistant</span>
+                <Handshake className="h-4 w-4" />
+                <span>Join Hands</span>
               </Button>
             </Link>
           </div>
@@ -201,6 +202,7 @@ const Navigation = () => {
               {
                 to: "/joinhands",
                 label: "Join Hands",
+                icon: <Handshake className="h-4 w-4" />,
               },
             ].map(({ to, label, icon }) => (
               <Link key={to} to={to} onClick={() => setMobileMenuOpen(false)}>
