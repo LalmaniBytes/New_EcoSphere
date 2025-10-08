@@ -65,9 +65,11 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-1">
             <Link to="/">
               <Button
-                variant={isActive('/') ? 'default' : 'ghost'}
+                variant={isActive("/") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
-                  isActive('/') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                  isActive("/")
+                    ? "bg-emerald-500 hover:bg-emerald-600"
+                    : "hover:bg-emerald-50"
                 }`}
                 data-testid="nav-home-btn"
               >
@@ -78,9 +80,11 @@ const Navigation = () => {
 
             <Link to="/report">
               <Button
-                variant={isActive('/report') ? 'default' : 'ghost'}
+                variant={isActive("/report") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
-                  isActive('/report') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                  isActive("/report")
+                    ? "bg-emerald-500 hover:bg-emerald-600"
+                    : "hover:bg-emerald-50"
                 }`}
                 data-testid="nav-report-btn"
               >
@@ -91,9 +95,11 @@ const Navigation = () => {
 
             <Link to="/chat">
               <Button
-                variant={isActive('/chat') ? 'default' : 'ghost'}
+                variant={isActive("/chat") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
-                  isActive('/chat') ? 'bg-emerald-500 hover:bg-emerald-600' : 'hover:bg-emerald-50'
+                  isActive("/chat")
+                    ? "bg-emerald-500 hover:bg-emerald-600"
+                    : "hover:bg-emerald-50"
                 }`}
                 data-testid="nav-chat-btn"
               >
@@ -193,9 +199,8 @@ const Navigation = () => {
                 icon: <FileText className="h-4 w-4" />,
               },
               {
-                to: "/chat",
-                label: "AI Assistant",
-                icon: <MessageCircle className="h-4 w-4" />,
+                to: "/joinhands",
+                label: "Join Hands",
               },
             ].map(({ to, label, icon }) => (
               <Link key={to} to={to} onClick={() => setMobileMenuOpen(false)}>
