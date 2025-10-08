@@ -6,10 +6,12 @@ import ReportPage from './pages/ReportPage';
 import ChatPage from './pages/ChatPage';
 import JoinHands from './pages/joinhands';
 import ChatWidget from './pages/chatwidget';
+
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
 import '@/App.css';
 import NoiseWidget from './hooks/NoiseWidget';
+import MentalHealthAudio from './pages/MentalHealthAudio';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -89,7 +91,11 @@ function App() {
             element={
               <JoinHands/>} 
           />
-          
+          <Route 
+            path="/mentalhealth" 
+            element={
+              <MentalHealthAudio/>} 
+          />
           
         </Routes>
         {/* Floating Chat Widget */}
