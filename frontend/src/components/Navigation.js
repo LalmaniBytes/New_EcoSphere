@@ -11,7 +11,7 @@ import {
   UserPlus,
   Menu,
   X,
-  Handshake
+  Handshake,
 } from "lucide-react";
 
 const Navigation = () => {
@@ -107,7 +107,6 @@ const Navigation = () => {
                 <Handshake className="h-4 w-4" />
                 <span>Join Hands</span>
               </Button>
-
             </Link>
             <Link to="/mentalhealth">
               <Button
@@ -119,11 +118,18 @@ const Navigation = () => {
                 }`}
                 data-testid="nav-mentalhealth-btn"
               >
-               
                 <span>🎶Vibe Cure</span>
               </Button>
             </Link>
-
+            <Link to="/comparison">
+              <Button
+                variant="ghost"
+                className="flex items-center space-x-2 px-4 py-2 rounded-md text-emerald-700 bg-white hover:bg-emerald-50 hover:text-emerald-800 transition-colors duration-200"
+                data-testid="nav-mentalhealth-btn"
+              >
+                <span>Compare</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Auth Buttons */}
@@ -219,6 +225,21 @@ const Navigation = () => {
                 to: "/joinhands",
                 label: "Join Hands",
                 icon: <Handshake className="h-4 w-4" />,
+              },
+              {
+                to: "/mentalhealth",
+                label: "🎶Vibe Cure",
+                icon: (
+                  <Button
+                    variant={isActive("/mentalhealth") ? "default" : "ghost"}
+                    className={`flex items-center space-x-2 ${
+                      isActive("/mentalhealth")
+                        ? "bg-emerald-500 hover:bg-emerald-600"
+                        : "hover:bg-emerald-50"
+                    }`}
+                    data-testid="nav-mentalhealth-btn"
+                  ></Button>
+                ),
               },
             ].map(({ to, label, icon }) => (
               <Link key={to} to={to} onClick={() => setMobileMenuOpen(false)}>

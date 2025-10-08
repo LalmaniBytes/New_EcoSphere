@@ -6,7 +6,6 @@ import ReportPage from './pages/ReportPage';
 import ChatPage from './pages/ChatPage';
 import JoinHands from './pages/joinhands';
 import ChatWidget from './pages/chatwidget';
-import Footer from './components/footer';
 
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
@@ -16,14 +15,14 @@ import MentalHealthAudio from './pages/MentalHealthAudio';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-console.log("Backend URL:", BACKEND_URL); 
+console.log("Backend URL:", BACKEND_URL);
 
 // Set axios defaults
 axios.defaults.baseURL = API;
 
 function App() {
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [locationPermission, setLocationPermission] = useState('prompt');
+  const [locationPermission, setLocationPermission] = useState("prompt");
 
   useEffect(() => {
     // Request location permission on app load
@@ -32,18 +31,18 @@ function App() {
         (position) => {
           setCurrentLocation({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
           });
-          setLocationPermission('granted');
+          setLocationPermission("granted");
         },
         (error) => {
-          console.error('Error getting location:', error);
-          setLocationPermission('denied');
+          console.error("Error getting location:", error);
+          setLocationPermission("denied");
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 300000 // 5 minutes
+          maximumAge: 300000, // 5 minutes
         }
       );
     }
@@ -53,61 +52,43 @@ function App() {
     <Router>
       <div className="App min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-blue-50">
         <Navigation />
-        
+
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
-              <HomePage 
+              <HomePage
                 currentLocation={currentLocation}
                 setCurrentLocation={setCurrentLocation}
                 locationPermission={locationPermission}
               />
-            } 
+            }
           />
-          <Route 
-            path="/report" 
+          <Route
+            path="/report"
             element={
-              <ReportPage 
+              <ReportPage
                 currentLocation={currentLocation}
                 setCurrentLocation={setCurrentLocation}
               />
-            } 
+            }
           />
-          <Route 
-            path="/chat" 
-            element={
-              <ChatPage 
-                currentLocation={currentLocation}
-              />
-            } 
+          <Route
+            path="/chat"
+            element={<ChatPage currentLocation={currentLocation} />}
           />
-          <Route 
-            path="/noise" 
-            element={
-              <NoiseWidget />} 
-          />
-          <Route 
-            path="/joinhands" 
-            element={
-              <JoinHands/>} 
-          />
-          <Route 
-            path="/mentalhealth" 
-            element={
-              <MentalHealthAudio/>} 
-          />
-          
+          <Route path="/noise" element={<NoiseWidget />} />
+          <Route path="/joinhands" element={<JoinHands />} />
+          <Route path="/mentalhealth" element={<MentalHealthAudio />} />
+          <Route path="/comparison" element={<ComparisonPage />} />
         </Routes>
-        {/* Floating Chat Widget */}
         <ChatWidget currentLocation={currentLocation} />
 
-        <Footer/>
+        
         <Toaster position="top-right" />
       </div>
     </Router>
   );
 }
-
 
 export default App;
