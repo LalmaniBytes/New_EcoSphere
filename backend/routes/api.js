@@ -5,6 +5,12 @@ import { chatWithAI } from '../controllers/chatController.js';
 import noiseRoute from './noise.js';
 import trafficRoute from '../services/tomtomNoise.js';
 import { reverseGeocode , createCivicReport , getCivicReports} from '../controllers/civicReport.controller.js';
+import bcrypt from "bcryptjs";
+import userModel from "../models/user.model.js";
+import { OAuth2Client } from "google-auth-library";
+import session from "express-session";
+import signup from './signup.js';
+import signin from './signin.js';
 
 const router = express.Router();
 
@@ -34,5 +40,7 @@ router.get('/water-logging-zones', (req, res) => {
 
 router.use('/noise', noiseRoute);
 router.use('/traffic', trafficRoute);
+router.use('/signup', signup);
+router.use('/signin', signin);
 
 export default router;

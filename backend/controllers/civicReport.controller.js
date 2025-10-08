@@ -1,12 +1,8 @@
-// In /controllers/civicReport.controller.js
-
 import CivicReport from "../models/civicReport.model.js";
 import axios from "axios";
 
-// ✨ ADD THIS NEW CONTROLLER FUNCTION ✨
 export const reverseGeocode = async (req, res) => {
-  const { lat, lon } = req.query; // Get lat/lon from query parameters
-
+  const { lat, lon } = req.query; 
   if (!lat || !lon) {
     return res
       .status(400)
@@ -35,32 +31,56 @@ export const reverseGeocode = async (req, res) => {
 
 export const createCivicReport = async (req, res) => {
   try {
-    // 1. Destructure the expected fields from the request body
     const { report_type, description, severity, location } = req.body;
 
-    // 2. Validate the essential data
     if (!report_type || !description || !severity) {
       return res.status(400).json({ message: "Missing required report fields." });
     }
 
     if (!location || !location.latitude || !location.longitude) {
-      return res
-        .status(400)
-        .json({ message: "Location with latitude and longitude is required." });
+      return res.status(400).json({
+        message: "Location with latitude and longitude is required.",
+      });
     }
 
-    // 3. Create a new report directly from the request body
-    // The structure sent by the frontend already matches your schema
-    const newReport = new CivicReport(req.body);
+    // 🔄 Reverse geocode to get area name
+    let area = null;
+    try {
+      const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
+      const { data } = await axios.get(geoUrl, {
+        headers: {
+          "User-Agent": "EcoSphere/1.0",
+        },
+      });
+
+      const address = data.address;
+      // 🧠 Choose the most specific available area
+      area =
+        address.suburb ||
+        address.city ||
+        address.town ||
+        address.village ||
+        address.county ||
+        null;
+    } catch (geoError) {
+      console.warn("Reverse geocoding failed, saving without area.");
+    }
+
+    // 📝 Include area in the report data
+    const newReport = new CivicReport({
+      ...req.body,
+      area,
+    });
+
     const savedReport = await newReport.save();
-    
     console.log("Civic report created:", savedReport);
     res.status(201).json(savedReport);
   } catch (error) {
     console.error("Error creating civic report:", error);
-    res
-      .status(400) // Mongoose validation errors often result in a 400
-      .json({ message: "Failed to create civic report", error: error.message });
+    res.status(400).json({
+      message: "Failed to create civic report",
+      error: error.message,
+    });
   }
 };
 export const getCivicReports = async (req, res) => {
