@@ -33,8 +33,9 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
     civic_complaints,
     ai_suggestions,
     location,
+    ehs_score,
   } = data;
-
+console.log("EHS Score:", ehs_score);
   const getAQIStatus = (aqi) => {
     if (aqi <= 50)
       return {
@@ -154,47 +155,51 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
         </div>
 
         {/* Summary Metrics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-          <div className="bg-green-50 rounded-lg p-4 text-center">
-            <Badge variant="outline" className="mb-1">
-              EHS
-            </Badge>
-            <p className="text-2xl font-bold text-green-600">
-              {/* {data.health_data?.health} */}
-              82
-            </p>
-            <p className="text-sm text-gray-600"> environmental health score
-            </p>
-          </div>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+  {/* EHS Score */}
+  <div className="bg-green-50 rounded-lg p-4 text-center">
+    <Badge variant="outline" className="mb-1">
+      EHS
+    </Badge>
+    <p className="text-2xl font-bold text-green-600">
+      {/* Use the score from the ehs_score object */}
+      {data.ehs_score?.score || "N/A"}
+    </p>
+    <p className="text-sm text-gray-600">Environmental Health</p>
+  </div>
 
+  {/* AQI */}
+  <div className="bg-yellow-50 rounded-lg p-4 text-center">
+    <Badge variant="outline" className="mb-1">
+      AQI
+    </Badge>
+    <p className="text-2xl font-bold text-yellow-700">
+      {data.aqi_data?.aqi || "N/A"}
+    </p>
+    <p className="text-sm text-gray-600">Air Quality Index</p>
+  </div>
 
-          {/* AQI */}
-          <div className="bg-green-50 rounded-lg p-4 text-center">
-            <Badge variant="outline" className="mb-1">
-              AQI
-            </Badge>
-            <p className="text-2xl font-bold text-green-600">
-              {data.aqi_data?.aqi}
-            </p>
-            <p className="text-sm text-gray-600">Air Quality Index</p>
-          </div>
+  {/* Pollution Index (PM2.5) */}
+  <div className="bg-orange-50 rounded-lg p-4 text-center">
+    <Wind className="h-6 w-6 text-orange-600 mx-auto mb-1" />
+    <p className="text-2xl font-bold text-orange-700">
+        {data.aqi_data?.pm25 || "N/A"}
+    </p>
+    <p className="text-sm text-gray-600">PM2.5 (μg/m³)</p>
+  </div>
 
-          {/* Pollution Index */}
-          <div className="bg-emerald-50 rounded-lg p-4 text-center">
-            <Wind className="h-6 w-6 text-emerald-600 mx-auto mb-1" />
-            <p className="text-2xl font-bold">{data.aqi_data?.pm25}</p>
-            <p className="text-sm text-gray-600">Pollution Index</p>
-          </div>
-
-          {/* Noise Level */}
-          {data.noise_data && (
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <Droplets className="h-6 w-6 text-blue-600 mx-auto mb-1" />
-              <p className="text-2xl font-bold">{data.noise_data.db_range} </p>
-              <p className="text-sm text-gray-600">Noise Level</p>
-            </div>
-          )}
-        </div>
+  {/* Noise Level */}
+  {data.ehs_score?.breakdown?.estimatedDb && (
+    <div className="bg-blue-50 rounded-lg p-4 text-center">
+      <Volume2 className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+      <p className="text-2xl font-bold text-blue-700">
+        {/* Use the estimatedDb from the EHS breakdown */}
+        {data.ehs_score.breakdown.estimatedDb} dB
+      </p>
+      <p className="text-sm text-gray-600">Est. Noise Level</p>
+    </div>
+  )}
+</div>
 
         {/* AI Insights */}
         {data.ai_suggestions && data.ai_suggestions.length > 0 && (

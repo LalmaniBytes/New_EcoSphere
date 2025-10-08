@@ -204,7 +204,7 @@ export const getEnvironmentalReport = async (req, res) => {
       water_logging_risk: waterLoggingRisk,
       civic_complaints: nearbyComplaints,
       ai_suggestions: aiSuggestions,
-      // environmental_health_score: ehs,
+      environmental_health_score: ehs,
       timestamp: new Date(),
     };
 

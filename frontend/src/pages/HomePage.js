@@ -63,6 +63,7 @@ const HomePage = ({
         location: location,
         traffic_data: trafficResponse.data.traffic,
         noise_data: trafficResponse.data.noise,
+        ehs_score : response.data?.environmental_health_score,
       };
       setEnvironmentalData(combinedData);
       // setEnvironmentalData(response.data);
