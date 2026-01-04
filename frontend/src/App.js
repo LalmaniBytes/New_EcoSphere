@@ -12,6 +12,7 @@ import { Toaster } from './components/ui/sonner';
 import '@/App.css';
 import NoiseWidget from './hooks/NoiseWidget';
 import MentalHealthAudio from './pages/MentalHealthAudio';
+import ComparisonPage from './pages/ComparisonPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
