@@ -74,3 +74,4 @@ Based *only* on the contextual data above, provide a direct and helpful answer. 
     return "I'm sorry, I couldn't fetch the latest local data right now. Please try again in a moment.";
   }
 }
+  
