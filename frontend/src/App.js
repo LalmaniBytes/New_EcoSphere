@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import HomePage from "./pages/HomePage";
-import ReportPage from "./pages/ReportPage";
-import ChatPage from "./pages/ChatPage";
-import JoinHands from "./pages/joinhands";
-import ChatWidget from "./pages/chatwidget";
-import ComparisonPage from "./pages/ComparisonPage";
-import Navigation from "./components/Navigation";
-import { Toaster } from "./components/ui/sonner";
-import "@/App.css";
-import NoiseWidget from "./hooks/NoiseWidget";
-import MentalHealthAudio from "./pages/MentalHealthAudio";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import axios from 'axios';
+import HomePage from './pages/HomePage';
+import ReportPage from './pages/ReportPage';
+import ChatPage from './pages/ChatPage';
+import JoinHands from './pages/joinhands';
+import ChatWidget from './pages/chatwidget';
+
+import Navigation from './components/Navigation';
+import { Toaster } from './components/ui/sonner';
+import '@/App.css';
+import NoiseWidget from './hooks/NoiseWidget';
+import MentalHealthAudio from './pages/MentalHealthAudio';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -84,6 +84,7 @@ function App() {
         </Routes>
         <ChatWidget currentLocation={currentLocation} />
 
+        
         <Toaster position="top-right" />
       </div>
     </Router>
