@@ -1,4 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Ignore frontend and backend .env files
+frontend/.env
+backend/.env
+
+# Catch-all for any other .env files
+.env
+.env.*
+
 
 # IDE and editors
 .idea/
