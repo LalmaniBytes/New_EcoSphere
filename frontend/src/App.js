@@ -6,6 +6,7 @@ import ReportPage from './pages/ReportPage';
 import ChatPage from './pages/ChatPage';
 import JoinHands from './pages/joinhands';
 import ChatWidget from './pages/chatwidget';
+import About from './pages/About';  
 
 import Navigation from './components/Navigation';
 import { Toaster } from './components/ui/sonner';
@@ -82,7 +83,9 @@ function App() {
           <Route path="/joinhands" element={<JoinHands />} />
           <Route path="/mentalhealth" element={<MentalHealthAudio />} />
           <Route path="/comparison" element={<ComparisonPage />} />
+          <Route path="/About" element={<About />} />
         </Routes>
+
         <ChatWidget currentLocation={currentLocation} />
 
         
