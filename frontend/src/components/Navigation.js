@@ -130,6 +130,15 @@ const Navigation = () => {
                 <span>Compare</span>
               </Button>
             </Link>
+            <Link to="/About">
+              <Button
+                variant="ghost"
+                className="flex items-center space-x-2 px-4 py-2 rounded-md text-emerald-700 bg-white hover:bg-emerald-50 hover:text-emerald-800 transition-colors duration-200"
+                data-testid="nav-mentalhealth-btn"
+              >
+                <span>About</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Auth Buttons */}

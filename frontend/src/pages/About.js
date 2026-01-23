@@ -26,7 +26,7 @@ const About = () => {
           {/* Glassmorphism Card  */}
           <div className="backdrop-blur-md bg-white/10 p-8 rounded-3xl border border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <p className="text-xl md:text-2xl text-white mb-8 leading-relaxed">
-              <span className="font-bold">Who We Are:</span> We are a technology-driven initiative bridging the gap between urban data and on-ground environmental action.  We empower citizens to turn insights into a cleaner, healthier world.
+              <span className="font-bold">Who We Are:</span> We are a technology-driven initiative bridging the gap between urban data and <strong>on-ground environmental action</strong>.  We empower citizens to turn insights into a cleaner, healthier world.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="px-8 py-4 bg-[#00BCD4] hover:bg-[#00acc1] text-white font-bold rounded-full transition-all shadow-lg">
