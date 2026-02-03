@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import axios from 'axios';
-import HomePage from './pages/HomePage';
-import ReportPage from './pages/ReportPage';
-import ChatPage from './pages/ChatPage';
-import JoinHands from './pages/joinhands';
-import ChatWidget from './pages/chatwidget';
-
-import Navigation from './components/Navigation';
-import { Toaster } from './components/ui/sonner';
-import '@/App.css';
-import NoiseWidget from './hooks/NoiseWidget';
-import MentalHealthAudio from './pages/MentalHealthAudio';
-import ComparisonPage from './pages/ComparisonPage';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import axios from "axios";
+import HomePage from "./pages/HomePage";
+import ReportPage from "./pages/ReportPage";
+import ChatPage from "./pages/ChatPage";
+import JoinHands from "./pages/joinhands";
+import ChatWidget from "./pages/chatwidget";
+import SignupPage from "./pages/SignUpPage";
+import Navigation from "./components/Navigation";
+import { Toaster } from "./components/ui/sonner";
+import "@/App.css";
+import NoiseWidget from "./hooks/NoiseWidget";
+import MentalHealthAudio from "./pages/MentalHealthAudio";
+import ComparisonPage from "./pages/ComparisonPage";
+import UserDashboard from "./pages/userDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -44,7 +45,7 @@ function App() {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 300000, // 5 minutes
-        }
+        },
       );
     }
   }, []);
@@ -78,14 +79,15 @@ function App() {
             path="/chat"
             element={<ChatPage currentLocation={currentLocation} />}
           />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/noise" element={<NoiseWidget />} />
           <Route path="/joinhands" element={<JoinHands />} />
           <Route path="/mentalhealth" element={<MentalHealthAudio />} />
           <Route path="/comparison" element={<ComparisonPage />} />
+          <Route path="/user" element={<UserDashboard />} />
         </Routes>
         <ChatWidget currentLocation={currentLocation} />
 
-        
         <Toaster position="top-right" />
       </div>
     </Router>

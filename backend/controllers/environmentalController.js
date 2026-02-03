@@ -88,7 +88,7 @@ const data = {
 const fetchWeatherData = async (lat, lon) => {
   const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${process.env.WAQI_API_TOKEN}`;
   const response = await axios.get(url);
-  console.log("Weather API response:", response.data.data.iaqi);
+  // console.log(":", response.data.data.iaqi);
   const visibility = estimateVisibility({
     t: response.data.data?.iaqi.t?.v ?? 22.0,
     dew: response.data.data?.iaqi.d?.v ?? 20.0,
@@ -96,7 +96,7 @@ const fetchWeatherData = async (lat, lon) => {
     pm10: response.data.data?.iaqi.pm10?.v ?? 25.0,
     w: response.data.data?.iaqi.w?.v ?? 5.0,
   });
-  console.log("Visibility :", visibility);
+  // console.log("Visibility :", visibility);
   return {
     temperature: Math.round(response.data.data?.iaqi.t?.v ?? 22.0),
     humidity: Number(response.data.data?.iaqi.h?.v ?? 85).toFixed(1),
@@ -144,7 +144,7 @@ export async function buildEnvironmentalData(latitude, longitude) {
   const waterLoggingRisk = calculateWaterLoggingRisk(latitude, longitude);
 
   // Return a structured object with all the fetched data
-  console.log("Fetched Environmental Data:", aqiData.forecast);
+  // console.log("Fetched Environmental Data:", aqiData.forecast);
   return {
     aqi_data: aqiData,
     weather_data: weatherData,
@@ -187,7 +187,7 @@ export const getEnvironmentalReport = async (req, res) => {
       windSpeed: weatherData.wind_speed, // Assuming wind_speed is in m/s
       congestionScore: trafficData.congestionScore,
     });
-    console.log("Calculated EHS:", ehs);
+    // console.log("Calculated EHS:", ehs);
     const waterLoggingRisk = calculateWaterLoggingRisk(latitude, longitude);
     const aiSuggestions = await getAiSuggestions({
       aqi: aqiData.aqi,

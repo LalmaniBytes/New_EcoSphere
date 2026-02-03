@@ -11,7 +11,7 @@ const trafficRoute = express.Router();
 trafficRoute.post("/", async (req, res) => {
   try {
     const { lat, lon } = req.body;
-    console.log("Received traffic request for:", lat, lon);
+    // console.log("Received traffic request for:", lat, lon);
     if (!lat || !lon) {
       return res
         .status(400)
@@ -29,16 +29,16 @@ trafficRoute.post("/", async (req, res) => {
     }
 
     const { currentSpeed, freeFlowSpeed } = data.flowSegmentData;
-    console.log(
-      "TomTom currentSpeed:",
-      currentSpeed,
-      "freeFlowSpeed:",
-      freeFlowSpeed
-    );
+    // console.log(
+    //   "TomTom currentSpeed:",
+    //   currentSpeed,
+    //   "freeFlowSpeed:",
+    //   freeFlowSpeed
+    // );
     // Calculate congestion %
     const congestionScore =
       ((freeFlowSpeed - currentSpeed) / freeFlowSpeed) * 100;
-    console.log("TomTom congestion score:", congestionScore);
+    // console.log("TomTom congestion score:", congestionScore);
     let noise;
     if (congestionScore < 20) {
       noise = {

@@ -2,7 +2,6 @@ import express from "express";
 import env from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import session from "express-session";
 import mongoose from "mongoose";
 import newsRoute from "./routes/news.js";
 import geminiRoute from "./routes/geminiRoute.js";
@@ -10,19 +9,12 @@ import noiseRoute from "./routes/noise.js";
 import geoapifyRoute from "./services/geoapify.js";
 import waqiRoute from "./services/waqi.js";
 import apiRoutes from "./routes/api.js";
+import MongoStore from "connect-mongo";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 5050;
 env.config();
-
-app.use(
-  session({
-    secret: "supersecretkey",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false },
-  })
-);
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -40,12 +32,13 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS"));x
     }
   },
   credentials: true,
 };
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(
   helmet({
     crossOriginEmbedderPolicy: false, // disable COEP for dev

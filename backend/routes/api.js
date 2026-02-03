@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from "jsonwebtoken";
 import { getEnvironmentalReport } from '../controllers/environmentalController.js';
 // import { createCivicReport, getCivicReports } from '../controllers/civicReportController.js';
 import { chatWithAI } from '../controllers/chatController.js';
@@ -11,6 +12,8 @@ import { OAuth2Client } from "google-auth-library";
 import session from "express-session";
 import signup from './signup.js';
 import signin from './signin.js';
+import authRouter from '../services/checkSession.js';
+import { authenticateToken } from '../middleware/jwtAuth.js';
 
 const router = express.Router();
 
@@ -42,5 +45,18 @@ router.use('/noise', noiseRoute);
 router.use('/traffic', trafficRoute);
 router.use('/signup', signup);
 router.use('/signin', signin);
+router.get("/auto-login", authenticateToken, (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ msg: "Not logged in" });
+  console.log("Token : ", token);
+  try {
+    const userData = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ msg: "User auto-logged in", user: userData });
+  } catch (err) {
+    console.log("error , ", err);
+    res.status(401).json({ msg: "Invalid or expired token" });
+  }
+});
+
 
 export default router;

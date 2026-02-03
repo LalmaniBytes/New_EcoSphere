@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "build": "echo 'Nothing to build'"
   },
   "keywords": [],
@@ -16,12 +16,15 @@
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
+    "connect-mongo": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "helmet": "^8.1.0",
     "https": "^1.0.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.19.1",
     "nodemon": "^3.1.10",
     "uuid": "^13.0.0"

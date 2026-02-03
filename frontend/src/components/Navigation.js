@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   MapPin,
   MessageCircle,
@@ -19,7 +20,21 @@ const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState(null); // 'signin' | 'signup' | null
   const [user, setUser] = useState(null);
-
+  console.log("User :", user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    axios
+      .get("/auto-login", { withCredentials: true })
+      .then((res) => {
+        console.log("Auto login reponse : ", res.data);
+        setUser(res.data.user);
+        // navigate("/user");
+      })
+      .catch((err) => {
+        console.log("User not logged in yet");
+        console.log("Err ;", err);
+      });
+  }, []);
   const isActive = (path) => location.pathname === path;
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
 
@@ -30,20 +45,34 @@ const Navigation = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
-      const profile = JSON.parse(atob(token.split(".")[1])); // decode email
+      const profile = JSON.parse(atob(token.split(".")[1]));
       const email = profile.email;
 
+      const endpoint =
+        authMode === "signup"
+          ? "/signup/google" // FINALIZE signup
+          : "/signin"; // normal login
+
       const { data } = await axios.post(
-        "/signin",
-        { email, token },
-        { withCredentials: true }
+        endpoint,
+        { email },
+        { withCredentials: true },
       );
-      setUser(data.user);
+
+      console.log("data :", data);
+
+      // Only set user if backend returns it
+      if (data.user) {
+        setUser(data.user);
+        alert("Welcome " + data.user.username);
+      } else if (data.message) {
+        alert(data.message);
+      }
+
       setAuthMode(null);
-      alert("Welcome " + data.user.username);
     } catch (err) {
-      console.error(err);
-      alert("Login failed");
+      console.error(err.response?.data || err);
+      alert(err.response?.data?.detail || "Authentication failed");
     }
   };
 
@@ -149,10 +178,11 @@ const Navigation = () => {
                 <Button
                   size="sm"
                   className="hidden sm:flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600"
-                  onClick={() => setAuthMode("signup")}
                 >
                   <UserPlus className="h-4 w-4" />
-                  <span>Sign Up</span>
+                  <span>
+                    <Link to="/signup">Sign Up</Link>
+                  </span>
                 </Button>
               </>
             ) : (
@@ -163,9 +193,19 @@ const Navigation = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => {
-                    axios.post("/signin/logout");
-                    setUser(null);
+                  onClick={async () => {
+                    try {
+                      const dltData = await axios.post("/signin/logout", {} , {
+                        withCredentials: true,
+                      });
+                      console.log("dlt data: ", dltData);
+                      setUser(null);
+                      navigate("/");
+                      
+                      alert("Logout Successful !");
+                    } catch (err) {
+                      console.log("logout failed :", err);
+                    }
                   }}
                 >
                   Logout
