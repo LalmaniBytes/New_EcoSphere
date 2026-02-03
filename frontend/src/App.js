@@ -6,7 +6,7 @@ import ReportPage from "./pages/ReportPage";
 import ChatPage from "./pages/ChatPage";
 import JoinHands from "./pages/joinhands";
 import ChatWidget from "./pages/chatwidget";
-import SignupPage from "./pages/SignUpPage";
+import SignupPage from "./pages/SignUpPage";import About from './pages/About';
 import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/sonner";
 import "@/App.css";
@@ -14,6 +14,11 @@ import NoiseWidget from "./hooks/NoiseWidget";
 import MentalHealthAudio from "./pages/MentalHealthAudio";
 import ComparisonPage from "./pages/ComparisonPage";
 import UserDashboard from "./pages/userDashboard";
+import AdminLayout from './layout/Admin_Layout';
+import Admin from './pages/Admin/Admin';
+import CaseManagement from './pages/Admin/CaseManagement';
+import ActiveProject from './pages/Admin/ActiveProject';
+import ReportAndDocumentPage from './pages/Admin/ReportAndDocumentpage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -84,9 +89,18 @@ function App() {
           <Route path="/joinhands" element={<JoinHands />} />
           <Route path="/mentalhealth" element={<MentalHealthAudio />} />
           <Route path="/comparison" element={<ComparisonPage />} />
-          <Route path="/user" element={<UserDashboard />} />
+          <Route path="/About" element={<About />} />
+          {/* ADMIN PANEL ROUTES */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Admin />} />
+            <Route path="cases" element={<CaseManagement />} />
+            <Route path="projects" element={<ActiveProject />} />
+            <Route path="Reports" element={<ReportAndDocumentPage />} />
+          </Route>
         </Routes>
+
         <ChatWidget currentLocation={currentLocation} />
+
 
         <Toaster position="top-right" />
       </div>
