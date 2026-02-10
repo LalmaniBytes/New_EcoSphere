@@ -26,6 +26,7 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.19.1",
+    "node-fetch": "^3.3.2",
     "nodemon": "^3.1.10",
     "uuid": "^13.0.0"
   }

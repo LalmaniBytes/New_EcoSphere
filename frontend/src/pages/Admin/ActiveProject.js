@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 // Mock Data for Comparative Analysis
-const radialData = [
+const radiarechartslData = [
   { subject: 'Air Quality', A: 120, B: 110, fullMark: 150 },
   { subject: 'Waste Management', A: 98, B: 130, fullMark: 150 },
   { subject: 'Water Purity', A: 86, B: 130, fullMark: 150 },

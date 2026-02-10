@@ -31,6 +31,7 @@ export async function generateReply({ message }) {
 export async function generateReplyHome({ message, location }) {
   try {
     // 1. Fetch the live environmental data, which now includes the forecast
+    // console.log("Location : ", location)
     const environmentalData = await buildEnvironmentalData(
       location.latitude,
       location.longitude

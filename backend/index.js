@@ -11,6 +11,7 @@ import waqiRoute from "./services/waqi.js";
 import apiRoutes from "./routes/api.js";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
+import fetch from "node-fetch";
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -59,6 +60,9 @@ app.use("/gemini", geminiRoute);
 app.use("/noise", noiseRoute);
 app.use("/geoapify", geoapifyRoute);
 app.use("/waqi", waqiRoute);
+
+const ipCheck = await fetch("https://api.ipify.org?format=json");
+console.log(await ipCheck.json());
 
 app.listen(PORT, () => {
   console.log("Server is running on port 5050");
