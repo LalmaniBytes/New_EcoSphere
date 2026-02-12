@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Search, Calendar as CalendarIcon, MapPin } from "lucide-react";
 
-// IMPORTANT: Ensure Axios always sends cookies with requests
 axios.defaults.withCredentials = true;
 
 export default function JoinHands() {
   const [activeTab, setActiveTab] = useState("join");
   const [drives, setDrives] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filter States
+  const [filterLocation, setFilterLocation] = useState("");
+  const [filterDate, setFilterDate] = useState("");
 
   const [newDrive, setNewDrive] = useState({
     title: "",
@@ -20,11 +24,10 @@ export default function JoinHands() {
     description: "",
   });
 
-  // 1. Fetch Drives
   useEffect(() => {
     const fetchDrives = async () => {
       try {
-        const response = await axios.get("/cleanup-drive/drives"); // Check your port!
+        const response = await axios.get("/cleanup-drive/drives");
         setDrives(response.data);
       } catch (error) {
         console.error("Failed to fetch drives:", error);
@@ -32,32 +35,23 @@ export default function JoinHands() {
         setLoading(false);
       }
     };
-
     fetchDrives();
   }, []);
 
-  // 2. Create Drive Function
+  // Filter Logic
+  const filteredDrives = drives.filter((drive) => {
+    const matchesLocation = drive.location.toLowerCase().includes(filterLocation.toLowerCase());
+    const matchesDate = filterDate ? drive.date.startsWith(filterDate) : true;
+    return matchesLocation && matchesDate;
+  });
+
   const handleCreateDrive = async () => {
-    // Basic Validation
     if (!newDrive.title || !newDrive.location || !newDrive.date || !newDrive.description) {
       return alert("Please fill all fields!");
     }
-
     try {
-      const payload = {
-        title: newDrive.title,
-        location: newDrive.location,
-        date: newDrive.date,
-        description: newDrive.description,
-        // No need to send 'organizer' anymore!
-      };
-
-      // The cookie is sent automatically because of { withCredentials: true }
-      const response = await axios.post(
-        "cleanup-drive/create", 
-        payload,
-        { withCredentials: true } // Explicitly enabling cookies for this request
-      );
+      const payload = { ...newDrive };
+      const response = await axios.post("cleanup-drive/create", payload);
 
       if (response.status === 201) {
         setDrives((prev) => [response.data, ...prev]);
@@ -66,131 +60,161 @@ export default function JoinHands() {
         setActiveTab("join");
       }
     } catch (error) {
-      console.error("Error creating drive:", error);
-      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        alert("🔒 You must be logged in to create a drive.");
-      } else {
-        alert("❌ Failed to create drive. Please try again.");
-      }
+      alert("❌ Failed to create drive.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-emerald-100 flex flex-col items-center pt-28 pb-10 text-emerald-800">
-      <h1 className="text-4xl font-extrabold text-emerald-700 mb-10 drop-shadow-sm">
-        🌍 JoinHands
-      </h1>
+      <div className="max-w-7xl w-full px-6">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-emerald-700 mb-4 drop-shadow-sm">
+            🌍 JoinHands
+          </h1>
+          
+          {/* Navigation Buttons */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {["join", "start"].map((tab) => (
+              <Button
+                key={tab}
+                variant={activeTab === tab ? "default" : "outline"}
+                onClick={() => setActiveTab(tab)}
+                className={`px-8 py-2 rounded-full transition-all ${
+                  activeTab === tab
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
+                    : "border-emerald-500 text-emerald-700 hover:bg-emerald-100 shadow-sm"
+                }`}
+              >
+                {tab === "join" ? "Explore Drives" : "Start a Movement"}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex flex-wrap justify-center gap-4 mb-8">
-        {["join", "start"].map((tab) => (
-          <Button
-            key={tab}
-            variant={activeTab === tab ? "default" : "outline"}
-            onClick={() => setActiveTab(tab)}
-            className={`px-8 py-2 rounded-full transition-all ${
-              activeTab === tab
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
-                : "border-emerald-500 text-emerald-700 hover:bg-emerald-100 shadow-sm"
-            }`}
-          >
-            {tab === "join" ? "Join a Cleanup Drive" : "Start a Cleanup Drive"}
-          </Button>
-        ))}
-      </div>
-
-      <div className="w-full max-w-lg px-4">
         {activeTab === "join" && (
-          <Card className="shadow-lg border border-emerald-500 bg-emerald-50">
-            <CardHeader>
-              <CardTitle className="text-emerald-700">
-                🤝 Upcoming Drives
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {loading ? (
-                <p className="text-center text-emerald-600 animate-pulse">Loading drives...</p>
-              ) : drives.length === 0 ? (
-                <p className="text-center text-slate-500">No active drives found. Be the first to start one!</p>
-              ) : (
-                drives.map((drive) => (
-                  <div
-                    key={drive._id}
-                    className="p-4 border border-emerald-300 rounded-lg bg-white hover:border-emerald-500 transition-colors shadow-sm"
-                  >
-                    <h4 className="font-bold text-lg text-emerald-800">
-                      {drive.title}
-                    </h4>
-                    <p className="text-sm font-semibold text-emerald-600 italic">
-                      📍 {drive.location}
-                    </p>
-                    <p className="text-sm text-slate-600 mt-2">
-                      {drive.description}
-                    </p>
-                    <div className="mt-3 flex justify-between items-center">
-                      <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                        📅 {new Date(drive.date).toLocaleDateString()}
-                      </span>
-                      <Button
-                        size="sm"
-                        className="bg-emerald-600 text-white hover:bg-emerald-700"
-                        onClick={() => alert(`You joined: ${drive.title}`)}
-                      >
-                        Volunteer
-                      </Button>
-                    </div>
-                  </div>
-                ))
+          <div className="space-y-8">
+            {/* Filter Bar */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 flex flex-wrap gap-4 items-center justify-center">
+              <div className="relative flex-grow max-w-sm">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+                <Input 
+                  placeholder="Search by location..." 
+                  className="pl-10 border-emerald-100 focus:ring-emerald-500"
+                  value={filterLocation}
+                  onChange={(e) => setFilterLocation(e.target.value)}
+                />
+              </div>
+              <div className="relative flex-grow max-w-xs">
+                <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+                <Input 
+                  type="date"
+                  className="pl-10 border-emerald-100 focus:ring-emerald-500"
+                  value={filterDate}
+                  onChange={(e) => setFilterDate(e.target.value)}
+                />
+              </div>
+              {(filterLocation || filterDate) && (
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {setFilterLocation(""); setFilterDate("");}}
+                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                >
+                  Clear Filters
+                </Button>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Grid Layout */}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-64 bg-white/50 animate-pulse rounded-2xl border border-emerald-100" />
+                ))}
+              </div>
+            ) : filteredDrives.length === 0 ? (
+              <div className="text-center py-20 bg-white/30 rounded-3xl border-2 border-dashed border-emerald-200">
+                <p className="text-xl text-emerald-700/60 font-medium">No active drives match your filters.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredDrives.map((drive) => (
+                  <Card key={drive._id} className="shadow-md border-emerald-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white overflow-hidden group">
+                    <div className="h-2 bg-emerald-500 w-full" />
+                    <CardHeader>
+                      <CardTitle className="text-emerald-800 text-xl font-bold truncate">
+                        {drive.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2 text-emerald-600 font-medium text-sm">
+                        <MapPin className="h-4 w-4" />
+                        <span className="truncate">{drive.location}</span>
+                      </div>
+                      <p className="text-slate-600 text-sm line-clamp-3 min-h-[60px]">
+                        {drive.description}
+                      </p>
+                      <div className="pt-4 border-t border-emerald-50 flex justify-between items-center">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Event Date</span>
+                          <span className="text-xs font-bold text-emerald-500">
+                            📅 {new Date(drive.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <Button
+                          size="sm"
+                          className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm px-5"
+                          onClick={() => alert(`You joined: ${drive.title}`)}
+                        >
+                          Volunteer
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {activeTab === "start" && (
-          <Card className="shadow-lg border border-emerald-500 bg-emerald-50">
-            <CardHeader>
-              <CardTitle className="text-emerald-700">
-                🧹 Start a Movement
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                placeholder="Drive Title (e.g. Beach Cleanup)"
-                value={newDrive.title}
-                onChange={(e) =>
-                  setNewDrive({ ...newDrive, title: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Specific Location / Meeting Point"
-                value={newDrive.location}
-                onChange={(e) =>
-                  setNewDrive({ ...newDrive, location: e.target.value })
-                }
-              />
-              <Input
-                type="date"
-                value={newDrive.date}
-                onChange={(e) =>
-                  setNewDrive({ ...newDrive, date: e.target.value })
-                }
-              />
-              <Textarea
-                placeholder="What should volunteers bring? (Gloves, Bags, etc.)"
-                value={newDrive.description}
-                onChange={(e) =>
-                  setNewDrive({ ...newDrive, description: e.target.value })
-                }
-                className="min-h-[100px]"
-              />
-              <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 shadow-lg"
-                onClick={handleCreateDrive}
-              >
-                Launch Drive
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="flex justify-center">
+            <Card className="shadow-xl border-emerald-500 bg-white max-w-lg w-full">
+              <CardHeader className="bg-emerald-50 border-b border-emerald-100">
+                <CardTitle className="text-emerald-700 flex items-center gap-2">
+                  🧹 Start a Movement
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <Input
+                  placeholder="Drive Title (e.g. Beach Cleanup)"
+                  value={newDrive.title}
+                  onChange={(e) => setNewDrive({ ...newDrive, title: e.target.value })}
+                />
+                <Input
+                  placeholder="Specific Location / Meeting Point"
+                  value={newDrive.location}
+                  onChange={(e) => setNewDrive({ ...newDrive, location: e.target.value })}
+                />
+                <Input
+                  type="date"
+                  value={newDrive.date}
+                  onChange={(e) => setNewDrive({ ...newDrive, date: e.target.value })}
+                />
+                <Textarea
+                  placeholder="What should volunteers bring? (Gloves, Bags, etc.)"
+                  value={newDrive.description}
+                  onChange={(e) => setNewDrive({ ...newDrive, description: e.target.value })}
+                  className="min-h-[100px]"
+                />
+                <Button
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 shadow-lg"
+                  onClick={handleCreateDrive}
+                >
+                  Launch Drive
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
