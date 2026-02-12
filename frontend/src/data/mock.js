@@ -2,6 +2,7 @@ export const mentalHealthCategories = [
   {
     id: 'chronic-stress',
     title: 'Chronic Stress and Anxiety',
+    image: '/image/chronic-stress.png',
     description: 'Chronic stress occurs when the body remains in a heightened state of alert for extended periods. This can lead to persistent anxiety, tension headaches, digestive issues, and weakened immune function. These carefully curated audio tracks use calming frequencies and guided techniques to help regulate your nervous system and reduce cortisol levels.',
     color: 'from-blue-50 to-indigo-50',
     tracks: [
@@ -40,6 +41,7 @@ export const mentalHealthCategories = [
   {
     id: 'sleep-fatigue',
     title: 'Sleep Loss and Fatigue',
+    image: '/image/sleep-fatigue.png',
     description: 'Insufficient sleep disrupts cognitive function, emotional regulation, and physical recovery. Chronic sleep deprivation can lead to memory problems, mood swings, and increased risk of chronic diseases. These audio sessions promote deep relaxation and healthy sleep patterns through soothing sounds and sleep-inducing frequencies.',
     color: 'from-purple-50 to-pink-50',
     tracks: [
@@ -78,6 +80,7 @@ export const mentalHealthCategories = [
   {
     id: 'depression-mood',
     title: 'Depression and Mood Disorders',
+    image: '/image/depression-mood.png',
     description: 'Depression affects neurotransmitter levels, particularly serotonin and dopamine, leading to persistent sadness, loss of interest, and energy depletion. These therapeutic audio tracks combine uplifting frequencies, positive affirmations, and mood-enhancing techniques to support emotional balance and mental wellness.',
     color: 'from-amber-50 to-orange-50',
     tracks: [
@@ -122,6 +125,7 @@ export const mentalHealthCategories = [
   {
     id: 'heart-health',
     title: 'High Blood Pressure and Heart Issues',
+    image: '/image/heart-health.png',
     description: 'Chronic stress and poor lifestyle choices can elevate blood pressure, straining the cardiovascular system and increasing risk of heart disease and stroke. These specialized audio programs use heart-coherence techniques and calming rhythms to help lower blood pressure, reduce heart rate, and promote cardiovascular wellness.',
     color: 'from-red-50 to-rose-50',
     tracks: [
@@ -154,6 +158,7 @@ export const mentalHealthCategories = [
   {
     id: 'cognitive-overload',
     title: 'Mental Fatigue and Cognitive Overload',
+    image: '/image/cognitive-overload.png',
     description: 'Information overload and constant multitasking exhaust cognitive resources, leading to decreased focus, decision fatigue, and mental burnout. These audio tracks help restore mental clarity through brain-optimizing frequencies, focus-enhancing techniques, and cognitive reset exercises.',
     color: 'from-teal-50 to-cyan-50',
     tracks: [
@@ -192,6 +197,7 @@ export const mentalHealthCategories = [
   {
     id: 'burnout-exhaustion',
     title: 'Burnout and Emotional Exhaustion',
+    image: '/image/burnout-exhaustion.png',
     description: 'Prolonged workplace or personal stress can lead to burnout—a state of physical, emotional, and mental exhaustion. Symptoms include cynicism, detachment, and reduced performance. These restorative audio experiences help rebuild energy reserves and reconnect with inner peace.',
     color: 'from-emerald-50 to-green-50',
     tracks: [
