@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // Import this
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,9 +12,19 @@ const mockDrives = [
 ];
 
 export default function JoinHands() {
+  const location = useLocation(); // Hook to get URL params
   const [activeTab, setActiveTab] = useState("join");
   const [drives, setDrives] = useState(mockDrives);
   const [newDrive, setNewDrive] = useState({ title: "", location: "", date: "", description: "" });
+
+  // This effect checks the URL whenever it changes
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mode = params.get("mode");
+    if (mode === "start" || mode === "join") {
+      setActiveTab(mode);
+    }
+  }, [location]);
 
   const handleCreateDrive = () => {
     if (!newDrive.title || !newDrive.location)

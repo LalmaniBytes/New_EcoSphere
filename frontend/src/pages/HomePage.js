@@ -440,28 +440,24 @@ const HomePage = ({
       </div>
 
       {/* CIRCULAR CAUTION BUTTON */}
-      <div className="fixed bottom-24 right-6 z-50">
+      {/* <div className="fixed bottom-24 right-6 z-50">
         <button
           onClick={() => {
-            // We send the current location as "state" so the report page knows where we are
             navigate("/report", { state: { initialLocation: currentLocation } });
           }}
           className="group relative flex items-center justify-center w-16 h-16 transition-all hover:scale-110 active:scale-95 drop-shadow-lg"
         >
-          {/* Solid White Circle Background */}
           <div className="absolute inset-0 bg-white rounded-full border border-slate-100 shadow-sm transition-colors group-hover:bg-slate-50"></div>
 
-          {/* Subtle Pulse Effect */}
           <div className="absolute inset-0 bg-yellow-100 rounded-full animate-ping opacity-25"></div>
 
-          {/* The Alert Icon - Green/Emerald to match theme */}
           <AlertTriangle
             className="relative z-10 text-yellow-600 h-8 w-8 stroke-[2.5px]"
             fill="currentColor"
             fillOpacity="0.1"
           />
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

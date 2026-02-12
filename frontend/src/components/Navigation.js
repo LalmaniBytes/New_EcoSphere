@@ -13,28 +13,33 @@ import {
   Menu,
   X,
   Handshake,
+  ChevronDown,
+  ShieldCheck,
+  User,
 } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState(null); // 'signin' | 'signup' | null
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
   console.log("User :", user);
   const navigate = useNavigate();
+
   useEffect(() => {
     axios
       .get("/auto-login", { withCredentials: true })
       .then((res) => {
         console.log("Auto login reponse : ", res.data);
         setUser(res.data.user);
-        // navigate("/user");
       })
       .catch((err) => {
         console.log("User not logged in yet");
         console.log("Err ;", err);
       });
   }, []);
+
   const isActive = (path) => location.pathname === path;
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
 
@@ -61,7 +66,6 @@ const Navigation = () => {
 
       console.log("data :", data);
 
-      // Only set user if backend returns it
       if (data.user) {
         setUser(data.user);
         alert("Welcome " + data.user.username);
@@ -125,7 +129,7 @@ const Navigation = () => {
 
             <Link to="/joinhands">
               <Button
-                variant={isActive("/chat") ? "default" : "ghost"}
+                variant={isActive("/joinhands") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
                   isActive("/joinhands")
                     ? "bg-emerald-500 hover:bg-emerald-600"
@@ -159,30 +163,51 @@ const Navigation = () => {
                 <span>Compare</span>
               </Button>
             </Link>
-            <Link to="/About">
-              <Button
-                variant="ghost"
-                className="flex items-center space-x-2 px-4 py-2 rounded-md text-emerald-700 bg-white hover:bg-emerald-50 hover:text-emerald-800 transition-colors duration-200"
-                data-testid="nav-mentalhealth-btn"
-              >
-                <span>About</span>
-              </Button>
-            </Link>
           </div>
 
           {/* Auth Buttons */}
           <div className="flex items-center space-x-2">
             {!user ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex items-center space-x-2 border-emerald-200 hover:bg-emerald-50"
-                  onClick={() => setAuthMode("signin")}
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>Login</span>
-                </Button>
+                {/* LOGIN DROPDOWN CONTAINER */}
+                <div className="relative hidden sm:block">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2 border-emerald-200 hover:bg-emerald-50"
+                    onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Login</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${loginDropdownOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+
+                  {loginDropdownOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-48 bg-white border border-emerald-100 rounded-lg shadow-xl py-2 z-[60]"
+                      onMouseLeave={() => setLoginDropdownOpen(false)}
+                    >
+                      <button
+                        onClick={() => { setAuthMode("signin"); setLoginDropdownOpen(false); }}
+                        className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                      >
+                        <User className="h-4 w-4" />
+                        <span>Citizen Login</span>
+                      </button>
+                      
+                      <div className="border-t border-gray-100 my-1"></div>
+                      
+                      <Link
+                        to="/admin-login"
+                        onClick={() => setLoginDropdownOpen(false)}
+                        className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                      >
+                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                        <span className="font-medium text-emerald-800">Admin Login</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
                 <Button
                   size="sm"
@@ -210,7 +235,6 @@ const Navigation = () => {
                       console.log("dlt data: ", dltData);
                       setUser(null);
                       navigate("/");
-                      
                       alert("Logout Successful !");
                     } catch (err) {
                       console.log("logout failed :", err);
@@ -265,11 +289,11 @@ const Navigation = () => {
           <div className="md:hidden mt-2 flex flex-col space-y-1 pb-2">
             {[
               { to: "/", label: "Home", icon: <MapPin className="h-4 w-4" /> },
-              // {
-              //   to: "/report",
-              //   label: "Report Issue",
-              //   icon: <FileText className="h-4 w-4" />,
-              // },
+              {
+                to: "/report-issue",
+                label: "Report Issue",
+                icon: <FileText className="h-4 w-4" />,
+              },
               {
                 to: "/joinhands",
                 label: "Join Hands",
@@ -278,23 +302,23 @@ const Navigation = () => {
               {
                 to: "/mentalhealth",
                 label: "🎶Vibe Cure",
-                icon: (
-                  <Button
-                    variant={isActive("/mentalhealth") ? "default" : "ghost"}
-                    className={`flex items-center space-x-2 ${
-                      isActive("/mentalhealth")
-                        ? "bg-emerald-500 hover:bg-emerald-600"
-                        : "hover:bg-emerald-50"
-                    }`}
-                    data-testid="nav-mentalhealth-btn"
-                  ></Button>
-                ),
+                icon: null,
+              },
+              {
+                to: "/comparison",
+                label: "Compare",
+                icon: null,
+              },
+              {
+                to: "/admin-login",
+                label: "Admin Portal",
+                icon: <ShieldCheck className="h-4 w-4" />,
               },
             ].map(({ to, label, icon }) => (
               <Link key={to} to={to} onClick={() => setMobileMenuOpen(false)}>
                 <Button
                   variant={isActive(to) ? "default" : "ghost"}
-                  className={`w-full flex items-center space-x-2 ${
+                  className={`w-full justify-start flex items-center space-x-2 ${
                     isActive(to)
                       ? "bg-emerald-500 hover:bg-emerald-600"
                       : "hover:bg-emerald-50"

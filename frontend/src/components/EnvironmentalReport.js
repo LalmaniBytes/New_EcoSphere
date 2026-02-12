@@ -259,25 +259,6 @@ const EnvironmentalReport = ({ data, onRefresh, loading }) => {
             )}
           </div>
         </div>
-
-
-        {/* AI Insights */}
-        {data.ai_suggestions && data.ai_suggestions.length > 0 && (
-          <div>
-            <h4 className="font-semibold text-gray-700 mb-2">AI Insights</h4>
-            <ul className="space-y-2">
-              {data.ai_suggestions.map((tip, index) => (
-                <li
-                  key={index}
-                  className="flex items-start gap-2 text-gray-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100"
-                >
-                  <span className="text-emerald-600 mt-0.5">✔️</span>
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </Card>
 
 

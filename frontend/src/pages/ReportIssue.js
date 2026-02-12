@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-// Added Select imports
 import {
   Select,
   SelectContent,
@@ -12,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, CheckCircle2, MapPin, Camera, Building2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, MapPin, Camera, Building2, Loader2 } from "lucide-react";
+import axios from "axios";
 
 export default function ReportIssuePage() {
   const [issues, setIssues] = useState([]);
@@ -20,9 +20,10 @@ export default function ReportIssuePage() {
     title: "", 
     description: "", 
     location: "",
-    department: "" // New field
+    department: "" 
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   const departments = [
     "Environmental",
@@ -33,9 +34,56 @@ export default function ReportIssuePage() {
     "Others"
   ];
 
+  // 1. AUTO-LOCATION FETCHING ON MOUNT
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (navigator.geolocation) {
+        setIsLocating(true);
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Using OpenStreetMap reverse geocoding
+            const response = await axios.get(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            const address = response.data.display_name;
+            setNewIssue(prev => ({ ...prev, location: address }));
+          } catch (error) {
+            console.error("Geocoding error", error);
+          } finally {
+            setIsLocating(false);
+          }
+        });
+      }
+    };
+    fetchLocation();
+  }, []);
+
+  // 2. SMART DEPARTMENT SELECTION (Keyword Matching)
+  useEffect(() => {
+    const title = newIssue.title.toLowerCase();
+    let suggestedDept = "";
+
+    if (title.includes("garbage") || title.includes("waste") || title.includes("dump")) {
+      suggestedDept = "hazardous waste management";
+    } else if (title.includes("pothole") || title.includes("road") || title.includes("street")) {
+      suggestedDept = "road";
+    } else if (title.includes("smoke") || title.includes("air") || title.includes("smog")) {
+      suggestedDept = "air";
+    } else if (title.includes("water") || title.includes("leak") || title.includes("logging")) {
+      suggestedDept = "water";
+    } else if (title.includes("tree") || title.includes("park") || title.includes("pollution")) {
+      suggestedDept = "environmental";
+    }
+
+    if (suggestedDept && suggestedDept !== newIssue.department) {
+      setNewIssue(prev => ({ ...prev, department: suggestedDept }));
+    }
+  }, [newIssue.title]);
+
   const handleReportIssue = () => {
     if (!newIssue.title || !newIssue.description || !newIssue.department)
-      return alert("Please fill all required fields, including the Department!");
+      return alert("Please fill all required fields!");
     
     const reported = { 
         ...newIssue, 
@@ -45,7 +93,7 @@ export default function ReportIssuePage() {
     };
     
     setIssues((prev) => [reported, ...prev]);
-    setNewIssue({ title: "", description: "", location: "", department: "" });
+    setNewIssue({ title: "", description: "", location: newIssue.location, department: "" });
     setIsSubmitted(true);
     setTimeout(() => setIsSubmitted(false), 3000);
   };
@@ -57,7 +105,7 @@ export default function ReportIssuePage() {
           <h1 className="text-4xl font-extrabold text-emerald-700 mb-2 drop-shadow-sm">
             🚨 Report an Issue
           </h1>
-          <p className="text-emerald-600 font-medium">Help us identify environmental or civic concerns in your area.</p>
+          <p className="text-emerald-600 font-medium">Auto-detecting your location for faster response.</p>
         </div>
 
         {isSubmitted && (
@@ -74,24 +122,28 @@ export default function ReportIssuePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 pt-6">
-            {/* Issue Title */}
+            
+            {/* Issue Title - Triggers Smart Dept */}
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1 text-emerald-600 uppercase">What is the issue?</label>
               <Input
-                placeholder="e.g. Open Garbage Dump / Water Logging"
+                placeholder="e.g. Open Garbage Dump (Smart suggest active...)"
                 value={newIssue.title}
                 onChange={(e) => setNewIssue({ ...newIssue, title: e.target.value })}
                 className="border-emerald-200 focus:ring-emerald-500"
               />
             </div>
 
-            {/* Exact Location */}
+            {/* Exact Location - Auto-filled but Editable */}
             <div className="space-y-2">
-              <label className="text-sm font-bold ml-1 text-emerald-600 uppercase">Exact Location</label>
+              <label className="text-sm font-bold ml-1 text-emerald-600 uppercase flex justify-between">
+                Exact Location
+                {isLocating && <span className="flex items-center gap-1 text-[10px] animate-pulse"><Loader2 className="h-3 w-3 animate-spin"/> Locating...</span>}
+              </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-emerald-400" />
                 <Input
-                  placeholder="Street name, Landmark, or Area"
+                  placeholder="Fetching location..."
                   value={newIssue.location}
                   onChange={(e) => setNewIssue({ ...newIssue, location: e.target.value })}
                   className="pl-10 border-emerald-200 focus:ring-emerald-500"
@@ -99,17 +151,17 @@ export default function ReportIssuePage() {
               </div>
             </div>
 
-            {/* Department Dropdown */}
+            {/* Department Dropdown - Auto-selected but Editable */}
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1 text-emerald-600 uppercase">Relevant Department</label>
               <Select 
                 onValueChange={(value) => setNewIssue({ ...newIssue, department: value })}
                 value={newIssue.department}
               >
-                <SelectTrigger className="border-emerald-200 focus:ring-emerald-500 w-full bg-white">
+                <SelectTrigger className={`border-emerald-200 focus:ring-emerald-500 w-full bg-white ${newIssue.department ? 'border-emerald-500 ring-1 ring-emerald-500' : ''}`}>
                     <div className="flex items-center gap-2 text-slate-500">
                         <Building2 className="h-4 w-4 text-emerald-400" />
-                        <SelectValue placeholder="Select the department to notify" />
+                        <SelectValue placeholder="Select the department" />
                     </div>
                 </SelectTrigger>
                 <SelectContent className="bg-white border-emerald-200">
@@ -133,16 +185,6 @@ export default function ReportIssuePage() {
               />
             </div>
 
-            {/* Photo Evidence */}
-            <div className="flex items-center gap-4 p-4 border-2 border-dashed border-emerald-200 rounded-xl bg-emerald-50/30 hover:bg-emerald-50 transition-colors cursor-pointer group">
-              <Camera className="h-8 w-8 text-emerald-400 group-hover:text-emerald-600" />
-              <div className="text-left">
-                <p className="text-sm font-bold text-emerald-700">Upload Photo Evidence</p>
-                <p className="text-xs text-emerald-500">Max size 5MB (PNG, JPG)</p>
-              </div>
-              <input type="file" className="hidden" />
-            </div>
-
             <Button
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg font-black shadow-lg transition-transform active:scale-95"
               onClick={handleReportIssue}
@@ -164,14 +206,8 @@ export default function ReportIssuePage() {
                   <CardContent className="p-4 flex justify-between items-center">
                     <div>
                       <h4 className="font-bold text-lg">{issue.title}</h4>
-                      <div className="flex flex-col gap-1 mt-1">
-                        <p className="text-sm text-slate-500 flex items-center gap-1">
-                            <MapPin className="h-3 w-3" /> {issue.location || "Location provided"}
-                        </p>
-                        <p className="text-xs font-bold text-emerald-600 uppercase flex items-center gap-1">
-                            <Building2 className="h-3 w-3" /> Dept: {issue.department}
-                        </p>
-                      </div>
+                      <p className="text-xs text-slate-500">{issue.location}</p>
+                      <Badge variant="outline" className="mt-2 text-emerald-600 border-emerald-600">{issue.department}</Badge>
                     </div>
                     <Badge className="bg-red-100 text-red-700 border-red-200">{issue.status}</Badge>
                   </CardContent>

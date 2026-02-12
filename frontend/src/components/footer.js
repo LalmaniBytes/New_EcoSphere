@@ -1,51 +1,90 @@
-// Footer.js
-import React from "react";
-import { MapPin, Mail, Phone } from "lucide-react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#10B891] text-white py-8 mt-10">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center px-4 gap-6">
+    <footer className="bg-emerald-900 text-slate-300 pt-16 pb-8 px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         
-        {/* Logo & Description */}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold">EcoSphere</h1>
-          <p className="text-sm max-w-xs">
-            Your go-to platform for real-time weather updates and environmental awareness.
+        {/* Brand & Mission */}
+        <div className="col-span-1 md:col-span-1">
+          <h2 className="text-2xl font-bold text-emerald-500 mb-4">EcoSphere</h2>
+          <p className="text-sm leading-relaxed">
+            A unified, AI-powered ecosystem connecting environmental awareness, 
+            civic action, and mental well-being for healthier urban communities.
           </p>
         </div>
 
-        {/* Quick Links */}
-        <div className="flex flex-col gap-2">
-          <h2 className="font-semibold">Quick Links</h2>
-          <a href="/" className="hover:underline">Home</a>
-          <a href="/about" className="hover:underline">About</a>
-          <a href="/services" className="hover:underline">Services</a>
-          <a href="/contact" className="hover:underline">Contact</a>
+        {/* Updated Platform Portion */}
+        <div>
+          <h3 className="text-white font-semibold mb-4 text-lg">Platform</h3>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link to="/report-issue"
+              onClick={() => window.scrollTo(0, 0)}
+              className="hover:text-emerald-400 transition">Report Issue</Link>
+            </li>
+            <li>
+              <Link to="/joinhands?mode=start"
+               onClick={() => window.scrollTo(0, 0)}
+               className="hover:text-emerald-400 transition">Start a Cleanup Drive</Link>
+            </li>
+            <li>
+              <Link to="/joinhands?mode=join" 
+              onClick={() => window.scrollTo(0, 0)}
+              className="hover:text-emerald-400 transition">Join a Cleanup Drive</Link>
+            </li>
+            <li>
+              <Link to="/mentalhealth" 
+              onClick={() => window.scrollTo(0, 0)}
+              className="hover:text-emerald-400 transition">Vibe Cure</Link>
+            </li>
+          </ul>
         </div>
 
-        {/* Contact Info */}
-        <div className="flex flex-col gap-2">
-          <h2 className="font-semibold">Contact Us</h2>
-          <div className="flex items-center gap-2">
-            <MapPin size={16} /> <span>Delhi, India</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Mail size={16} /> <span>info@ecosphere.com</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Phone size={16} /> <span>+91 9876543210</span>
+        {/* Data & Resources */}
+        <div>
+          <h3 className="text-white font-semibold mb-4 text-lg">Resources</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#" className="hover:text-emerald-400 transition">Air Quality Index</a></li>
+            <li><a href="#" className="hover:text-emerald-400 transition">Risk Scores</a></li>
+            <li><a href="#" className="hover:text-emerald-400 transition">NGO Partnerships</a></li>
+            <li><a href="#" className="hover:text-emerald-400 transition">Sustainability Blog</a></li>
+          </ul>
+        </div>
+
+        {/* Newsletter / Contact */}
+        <div>
+          <h3 className="text-white font-semibold mb-4 text-lg">Stay Updated</h3>
+          <p className="text-sm mb-4">Join our mission for a cleaner, healthier future.</p>
+          <div className="flex">
+            <input 
+              type="email" 
+              placeholder="Email address" 
+              className="bg-slate-800 border-none rounded-l-md px-4 py-2 w-full focus:ring-1 focus:ring-emerald-500 text-white outline-none"
+            />
+            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-r-md transition">
+              Join
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Text */}
-      <div className="mt-6 border-t border-white/30 pt-4 text-center text-sm">
-        &copy; {new Date().getFullYear()} EcoSphere. All rights reserved.
+      {/* Bottom Bar */}
+      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs">
+        <p>&copy; {new Date().getFullYear()} EcoSphere. All rights reserved.</p>
+        <div className="flex gap-6 mt-4 md:mt-0">
+          <a href="#" className="hover:text-white">Privacy Policy</a>
+          <a href="#" className="hover:text-white">Terms of Service</a>
+          <li>
+              <Link to="/About"
+               onClick={() => window.scrollTo(0, 0)}
+               className="hover:text-emerald-400 transition">About Us</Link>
+            </li>
+        </div>
       </div>
     </footer>
   );
 };
 
 export default Footer;
-
