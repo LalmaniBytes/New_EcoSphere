@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Navigation hook added
+import { useNavigate } from "react-router-dom";
 import {
   MapPin,
   Thermometer,
@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Sparkles,
   RefreshCw,
+  Handshake, // Imported Handshake icon
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
@@ -23,14 +24,13 @@ import { toast } from "sonner";
 import MapComponent from "../components/MapComponent";
 import EnvironmentalReport from "../components/EnvironmentalReport";
 import axios from "axios";
-import { add } from "date-fns";
 
 const HomePage = ({
   currentLocation,
   setCurrentLocation,
   locationPermission,
 }) => {
-  const navigate = useNavigate(); // Hook initialized here
+  const navigate = useNavigate();
   const [environmentalData, setEnvironmentalData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -49,6 +49,7 @@ const HomePage = ({
   const fetchEnvironmentalData = async (location) => {
     setLoading(true);
     try {
+      // This will use the global withCredentials=true (good for your backend)
       const response = await axios.post("/environmental-report", {
         latitude: location.latitude,
         longitude: location.longitude,
@@ -81,9 +82,12 @@ const HomePage = ({
   const handleLocationSelect = async (location) => {
     setLoading(true);
     try {
-      // 1. Get the real address from the coordinates first
       const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`;
-      const { data } = await axios.get(geoUrl);
+      
+      // --- FIX IS HERE: Explicitly disable credentials for this 3rd party request ---
+      const { data } = await axios.get(geoUrl, { withCredentials: false });
+      // -----------------------------------------------------------------------------
+      
       const address =
         data.display_name ||
         `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
@@ -121,7 +125,7 @@ const HomePage = ({
             longitude: position.coords.longitude,
             address: "Current Location",
           };
-          handleLocationSelect(location); 
+          handleLocationSelect(location);
         },
         (error) => {
           console.error("Error getting current location:", error);
@@ -142,6 +146,20 @@ const HomePage = ({
       fetchEnvironmentalData(currentLocation);
     }
   }, [currentLocation]);
+
+  // Logic to navigate to JoinHands with the location data
+  const handleNavigateToJoinHands = () => {
+    const locationToPass = selectedLocation || currentLocation;
+
+    if (locationToPass) {
+      navigate("/join-hands", {
+        state: { locationData: locationToPass },
+      });
+    } else {
+      // Navigate even if no location is selected, just without data
+      navigate("/join-hands");
+    }
+  };
 
   const getAQIStatus = (aqi) => {
     if (aqi <= 50)
@@ -439,25 +457,16 @@ const HomePage = ({
         </div>
       </div>
 
-      {/* CIRCULAR CAUTION BUTTON */}
-      {/* <div className="fixed bottom-24 right-6 z-50">
-        <button
-          onClick={() => {
-            navigate("/report", { state: { initialLocation: currentLocation } });
-          }}
-          className="group relative flex items-center justify-center w-16 h-16 transition-all hover:scale-110 active:scale-95 drop-shadow-lg"
+      {/* Floating Action Button for Join Hands */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button
+          onClick={handleNavigateToJoinHands}
+          className="rounded-full w-16 h-16 shadow-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:scale-110 transition-transform duration-200 flex items-center justify-center border-4 border-white"
+          title="Join Hands"
         >
-          <div className="absolute inset-0 bg-white rounded-full border border-slate-100 shadow-sm transition-colors group-hover:bg-slate-50"></div>
-
-          <div className="absolute inset-0 bg-yellow-100 rounded-full animate-ping opacity-25"></div>
-
-          <AlertTriangle
-            className="relative z-10 text-yellow-600 h-8 w-8 stroke-[2.5px]"
-            fill="currentColor"
-            fillOpacity="0.1"
-          />
-        </button>
-      </div> */}
+          <Handshake className="text-white h-8 w-8" />
+        </Button>
+      </div>
     </div>
   );
 };
