@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import ReportPage from "./pages/ReportPage";
 import ChatPage from "./pages/ChatPage";
 import JoinHands from "./pages/joinhands";
+import ReportIssuePage from "./pages/ReportIssue";
 import ChatWidget from "./pages/chatwidget";
 import SignupPage from "./pages/SignUpPage";import About from './pages/About';
 import Navigation from "./components/Navigation";
@@ -75,6 +76,15 @@ function App() {
             path="/report"
             element={
               <ReportPage
+                currentLocation={currentLocation}
+                setCurrentLocation={setCurrentLocation}
+              />
+            }
+          />
+          <Route
+            path="/report-issue"
+            element={
+              <ReportIssuePage
                 currentLocation={currentLocation}
                 setCurrentLocation={setCurrentLocation}
               />

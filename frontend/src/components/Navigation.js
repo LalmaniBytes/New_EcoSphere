@@ -108,11 +108,11 @@ const Navigation = () => {
               </Button>
             </Link>
 
-            {/* <Link to="/report">
+            <Link to="/report-issue">
               <Button
-                variant={isActive("/report") ? "default" : "ghost"}
+                variant={isActive("/report-issue") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
-                  isActive("/report")
+                  isActive("/report-issue")
                     ? "bg-emerald-500 hover:bg-emerald-600"
                     : "hover:bg-emerald-50"
                 }`}
@@ -121,7 +121,7 @@ const Navigation = () => {
                 <FileText className="h-4 w-4" />
                 <span>Report Issue</span>
               </Button>
-            </Link> */}
+            </Link>
 
             <Link to="/joinhands">
               <Button
