@@ -121,7 +121,7 @@ const HomePage = ({
             longitude: position.coords.longitude,
             address: "Current Location",
           };
-          handleLocationSelect(location);
+          handleLocationSelect(location); 
         },
         (error) => {
           console.error("Error getting current location:", error);
