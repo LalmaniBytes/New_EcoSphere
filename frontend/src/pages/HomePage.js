@@ -458,15 +458,7 @@ const HomePage = ({
       </div>
 
       {/* Floating Action Button for Join Hands */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <Button
-          onClick={handleNavigateToJoinHands}
-          className="rounded-full w-16 h-16 shadow-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:scale-110 transition-transform duration-200 flex items-center justify-center border-4 border-white"
-          title="Join Hands"
-        >
-          <Handshake className="text-white h-8 w-8" />
-        </Button>
-      </div>
+      
     </div>
   );
 };
