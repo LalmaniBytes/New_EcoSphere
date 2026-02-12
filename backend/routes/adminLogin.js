@@ -3,10 +3,7 @@ import express from "express";
 const adminLogin = express.Router();
 
 adminLogin.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("Admin Login Attempt:", { email, password });
-
+  const { email, password } = req.body;         
   try {
     if (
       email === process.env.ADMIN_EMAIL &&

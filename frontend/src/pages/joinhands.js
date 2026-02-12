@@ -1,39 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom"; // Import this
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const mockDrives = [
-  { id: 1, title: "🌳 Parkside Cleanup Drive", location: "Lodhi Garden, New Delhi", date: "2025-10-12", description: "Join us to clean and restore green patches around Lodhi Garden." },
-  { id: 2, title: "🏖️ Yamuna Riverbank Cleanup", location: "Yamuna Ghat, Delhi", date: "2025-10-20", description: "Help clear plastic waste along the Yamuna riverbanks." },
-  { id: 3, title: "🗑️ Nehru Place Street Drive", location: "Nehru Place, South Delhi", date: "2025-10-25", description: "Corporate volunteers and citizens unite to clean busy streets." },
-];
+// IMPORTANT: Ensure Axios always sends cookies with requests
+axios.defaults.withCredentials = true;
 
 export default function JoinHands() {
-  const location = useLocation(); // Hook to get URL params
   const [activeTab, setActiveTab] = useState("join");
-  const [drives, setDrives] = useState(mockDrives);
-  const [newDrive, setNewDrive] = useState({ title: "", location: "", date: "", description: "" });
+  const [drives, setDrives] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // This effect checks the URL whenever it changes
+  const [newDrive, setNewDrive] = useState({
+    title: "",
+    location: "",
+    date: "",
+    description: "",
+  });
+
+  // 1. Fetch Drives
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const mode = params.get("mode");
-    if (mode === "start" || mode === "join") {
-      setActiveTab(mode);
-    }
-  }, [location]);
+    const fetchDrives = async () => {
+      try {
+        const response = await axios.get("/cleanup-drive/drives"); // Check your port!
+        setDrives(response.data);
+      } catch (error) {
+        console.error("Failed to fetch drives:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleCreateDrive = () => {
-    if (!newDrive.title || !newDrive.location)
+    fetchDrives();
+  }, []);
+
+  // 2. Create Drive Function
+  const handleCreateDrive = async () => {
+    // Basic Validation
+    if (!newDrive.title || !newDrive.location || !newDrive.date || !newDrive.description) {
       return alert("Please fill all fields!");
-    const created = { ...newDrive, id: Date.now() };
-    setDrives((prev) => [created, ...prev]);
-    setNewDrive({ title: "", location: "", date: "", description: "" });
-    alert("✅ Cleanup drive created successfully!");
-    setActiveTab("join");
+    }
+
+    try {
+      const payload = {
+        title: newDrive.title,
+        location: newDrive.location,
+        date: newDrive.date,
+        description: newDrive.description,
+        // No need to send 'organizer' anymore!
+      };
+
+      // The cookie is sent automatically because of { withCredentials: true }
+      const response = await axios.post(
+        "cleanup-drive/create", 
+        payload,
+        { withCredentials: true } // Explicitly enabling cookies for this request
+      );
+
+      if (response.status === 201) {
+        setDrives((prev) => [response.data, ...prev]);
+        setNewDrive({ title: "", location: "", date: "", description: "" });
+        alert("✅ Cleanup drive created successfully!");
+        setActiveTab("join");
+      }
+    } catch (error) {
+      console.error("Error creating drive:", error);
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        alert("🔒 You must be logged in to create a drive.");
+      } else {
+        alert("❌ Failed to create drive. Please try again.");
+      }
+    }
   };
 
   return (
@@ -64,23 +103,45 @@ export default function JoinHands() {
         {activeTab === "join" && (
           <Card className="shadow-lg border border-emerald-500 bg-emerald-50">
             <CardHeader>
-              <CardTitle className="text-emerald-700">🤝 Upcoming Drives</CardTitle>
+              <CardTitle className="text-emerald-700">
+                🤝 Upcoming Drives
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {drives.map((drive) => (
-                <div
-                  key={drive.id}
-                  className="p-4 border border-emerald-300 rounded-lg bg-white hover:border-emerald-500 transition-colors shadow-sm"
-                >
-                  <h4 className="font-bold text-lg text-emerald-800">{drive.title}</h4>
-                  <p className="text-sm font-semibold text-emerald-600 italic">📍 {drive.location}</p>
-                  <p className="text-sm text-slate-600 mt-2">{drive.description}</p>
-                  <div className="mt-3 flex justify-between items-center">
-                    <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">📅 {drive.date}</span>
-                    <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">Volunteer</Button>
+              {loading ? (
+                <p className="text-center text-emerald-600 animate-pulse">Loading drives...</p>
+              ) : drives.length === 0 ? (
+                <p className="text-center text-slate-500">No active drives found. Be the first to start one!</p>
+              ) : (
+                drives.map((drive) => (
+                  <div
+                    key={drive._id}
+                    className="p-4 border border-emerald-300 rounded-lg bg-white hover:border-emerald-500 transition-colors shadow-sm"
+                  >
+                    <h4 className="font-bold text-lg text-emerald-800">
+                      {drive.title}
+                    </h4>
+                    <p className="text-sm font-semibold text-emerald-600 italic">
+                      📍 {drive.location}
+                    </p>
+                    <p className="text-sm text-slate-600 mt-2">
+                      {drive.description}
+                    </p>
+                    <div className="mt-3 flex justify-between items-center">
+                      <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
+                        📅 {new Date(drive.date).toLocaleDateString()}
+                      </span>
+                      <Button
+                        size="sm"
+                        className="bg-emerald-600 text-white hover:bg-emerald-700"
+                        onClick={() => alert(`You joined: ${drive.title}`)}
+                      >
+                        Volunteer
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </CardContent>
           </Card>
         )}
@@ -88,28 +149,38 @@ export default function JoinHands() {
         {activeTab === "start" && (
           <Card className="shadow-lg border border-emerald-500 bg-emerald-50">
             <CardHeader>
-              <CardTitle className="text-emerald-700">🧹 Start a Movement</CardTitle>
+              <CardTitle className="text-emerald-700">
+                🧹 Start a Movement
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Input
                 placeholder="Drive Title (e.g. Beach Cleanup)"
                 value={newDrive.title}
-                onChange={(e) => setNewDrive({ ...newDrive, title: e.target.value })}
+                onChange={(e) =>
+                  setNewDrive({ ...newDrive, title: e.target.value })
+                }
               />
               <Input
                 placeholder="Specific Location / Meeting Point"
                 value={newDrive.location}
-                onChange={(e) => setNewDrive({ ...newDrive, location: e.target.value })}
+                onChange={(e) =>
+                  setNewDrive({ ...newDrive, location: e.target.value })
+                }
               />
               <Input
                 type="date"
                 value={newDrive.date}
-                onChange={(e) => setNewDrive({ ...newDrive, date: e.target.value })}
+                onChange={(e) =>
+                  setNewDrive({ ...newDrive, date: e.target.value })
+                }
               />
               <Textarea
                 placeholder="What should volunteers bring? (Gloves, Bags, etc.)"
                 value={newDrive.description}
-                onChange={(e) => setNewDrive({ ...newDrive, description: e.target.value })}
+                onChange={(e) =>
+                  setNewDrive({ ...newDrive, description: e.target.value })
+                }
                 className="min-h-[100px]"
               />
               <Button

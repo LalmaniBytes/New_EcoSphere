@@ -15,6 +15,7 @@ import signin from './signin.js';
 import authRouter from '../services/checkSession.js';
 import { authenticateToken } from '../middleware/jwtAuth.js';
 import adminLogin from "../routes/adminLogin.js";
+import cleanupDrive from './cleaupDrive.js';
 
 const router = express.Router();
 
@@ -59,5 +60,6 @@ router.get("/auto-login", authenticateToken, (req, res) => {
   }
 });
 router.use('/admin', adminLogin);
+router.use('/cleanup-drive', cleanupDrive);
 
 export default router;
