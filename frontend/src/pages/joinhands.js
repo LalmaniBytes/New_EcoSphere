@@ -52,7 +52,7 @@ const DriveCard = ({ drive, onJoin }) => {
             </div>
             <div className="mt-auto">
               <button onClick={handleJoin} disabled={isJoining || available === 0}
-                className={`w-full md:w-auto ${available === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#2E7D32] hover:bg-[#1B5E20] text-white hover:-translate-y-0.5'} rounded-full px-8 py-3 font-semibold shadow-md transition-all`}>
+                className={`w-full md:w-auto ${available === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#2E7D32] hover:bg-emerald-900 text-white hover:-translate-y-0.5'} rounded-full px-8 py-3 font-semibold shadow-md transition-all`}>
                 {isJoining ? 'Joining...' : available === 0 ? 'Fully Booked' : 'Join Drive'}
               </button>
             </div>
@@ -150,10 +150,10 @@ export default function JoinHands() {
           <p className="text-gray-600 text-lg">Earn rewards while protecting your environment.</p>
           
           <div className="flex justify-center gap-4 mt-8">
-            <Button onClick={() => setActiveTab("join")} variant={activeTab === "join" ? "default" : "outline"} className={`rounded-full px-8 ${activeTab === "join" ? "bg-[#2E7D32]" : ""}`}>
+            <Button onClick={() => setActiveTab("join")} variant={activeTab === "join" ? "default" : "outline"} className={`rounded-full px-8 ${activeTab === "join" ? "bg-[#009C4A]" : ""}`}>
               Explore Drives
             </Button>
-            <Button onClick={() => setActiveTab("start")} variant={activeTab === "start" ? "default" : "outline"} className={`rounded-full px-8 ${activeTab === "start" ? "bg-[#2E7D32]" : ""}`}>
+            <Button onClick={() => setActiveTab("start")} variant={activeTab === "start" ? "default" : "outline"} className={`rounded-full px-8 ${activeTab === "start" ? "bg-[#009C4A]" : ""}`}>
               Start a Movement
             </Button>
           </div>
@@ -257,7 +257,7 @@ export default function JoinHands() {
         {activeTab === "start" && (
           <div className="flex justify-center animate-in slide-in-from-bottom-4 duration-500">
             <Card className="shadow-2xl border-none bg-white max-w-lg w-full rounded-3xl overflow-hidden">
-              <CardHeader className="bg-[#2E7D32] text-white p-8">
+              <CardHeader className="bg-emerald-700 text-white p-8">
                 <CardTitle className="text-3xl font-bold flex items-center gap-2">
                   🧹 Start a Movement
                 </CardTitle>
@@ -268,7 +268,7 @@ export default function JoinHands() {
                 <Input placeholder="Location" value={newDrive.location} onChange={(e) => setNewDrive({ ...newDrive, location: e.target.value })} />
                 <Input type="date" value={newDrive.date} onChange={(e) => setNewDrive({ ...newDrive, date: e.target.value })} />
                 <Textarea placeholder="Instructions for volunteers..." className="min-h-[120px]" value={newDrive.description} onChange={(e) => setNewDrive({ ...newDrive, description: e.target.value })} />
-                <Button className="w-full bg-[#2E7D32] hover:bg-[#1B5E20] py-6 text-lg font-bold rounded-2xl" onClick={handleCreateDrive}>
+                <Button className="w-full bg-emerald-500 hover:bg-emerald-900 py-6 text-lg font-bold rounded-2xl" onClick={handleCreateDrive}>
                   Launch Drive
                 </Button>
               </CardContent>
