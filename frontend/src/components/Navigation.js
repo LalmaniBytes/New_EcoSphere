@@ -108,7 +108,7 @@ const Navigation = () => {
               </Button>
             </Link>
 
-            <Link to="/report">
+            {/* <Link to="/report">
               <Button
                 variant={isActive("/report") ? "default" : "ghost"}
                 className={`flex items-center space-x-2 ${
@@ -121,7 +121,7 @@ const Navigation = () => {
                 <FileText className="h-4 w-4" />
                 <span>Report Issue</span>
               </Button>
-            </Link>
+            </Link> */}
 
             <Link to="/joinhands">
               <Button
@@ -265,11 +265,11 @@ const Navigation = () => {
           <div className="md:hidden mt-2 flex flex-col space-y-1 pb-2">
             {[
               { to: "/", label: "Home", icon: <MapPin className="h-4 w-4" /> },
-              {
-                to: "/report",
-                label: "Report Issue",
-                icon: <FileText className="h-4 w-4" />,
-              },
+              // {
+              //   to: "/report",
+              //   label: "Report Issue",
+              //   icon: <FileText className="h-4 w-4" />,
+              // },
               {
                 to: "/joinhands",
                 label: "Join Hands",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Navigation hook added
 import {
   MapPin,
   Thermometer,
@@ -29,6 +30,7 @@ const HomePage = ({
   setCurrentLocation,
   locationPermission,
 }) => {
+  const navigate = useNavigate(); // Hook initialized here
   const [environmentalData, setEnvironmentalData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -66,7 +68,6 @@ const HomePage = ({
         ehs_score: response.data?.environmental_health_score,
       };
       setEnvironmentalData(combinedData);
-      // setEnvironmentalData(response.data);
       setShowReport(true);
       toast.success("Environmental data loaded successfully!");
     } catch (error) {
@@ -96,8 +97,7 @@ const HomePage = ({
       // 3. Update state with the final object
       setSelectedLocation(updatedLocation);
       setCurrentLocation(updatedLocation);
-      console.log("Selected Location:", updatedLocation);
-      console.log("Current Location:", updatedLocation);
+
       // 4. NOW, call the data fetching function ONCE with the correct data
       fetchEnvironmentalData(updatedLocation);
     } catch (error) {
@@ -180,14 +180,13 @@ const HomePage = ({
       textColor: "text-red-900",
     };
   };
-  console.log("Environmental Data:", environmentalData);
+
   return (
     <div className="min-h-screen pt-16">
       {/* Hero Section */}
       {loading && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-b from-emerald-800 via-teal-900 to-blue-950 backdrop-blur-md">
           <div className="flex flex-col items-center text-center animate-fade-in">
-            {/* Animated Spinner Ring */}
             <div className="relative w-20 h-20 mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-emerald-400 animate-spin"></div>
               <div className="absolute inset-2 rounded-full border-2 border-emerald-300 opacity-40"></div>
@@ -196,7 +195,6 @@ const HomePage = ({
               </div>
             </div>
 
-            {/* Text Section */}
             <h2 className="text-3xl font-semibold text-white drop-shadow-md mb-2">
               Fetching Environmental Insights
             </h2>
@@ -205,23 +203,22 @@ const HomePage = ({
               sustainability data for your selected location...
             </p>
 
-            {/* Animated Glow Bar */}
             <div className="w-48 h-1 bg-emerald-500/40 rounded-full mt-6 overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300 to-transparent animate-[shine_2s_linear_infinite]" />
             </div>
           </div>
 
-          {/* Custom animation for glow bar */}
           <style>
             {`
-        @keyframes shine {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}
+              @keyframes shine {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+              }
+            `}
           </style>
         </div>
       )}
+
       <div className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-blue-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
@@ -245,7 +242,7 @@ const HomePage = ({
                 data-testid="use-current-location-btn"
               >
                 {loading ? (
-                  <div className="spinner mr-2" />
+                  <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
                 ) : (
                   <MapPin className="mr-2 h-5 w-5" />
                 )}
@@ -259,7 +256,6 @@ const HomePage = ({
           </div>
         </div>
 
-        {/* Decorative Earth Image */}
         <div className="absolute bottom-4 right-4 opacity-20">
           <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
             <span className="text-6xl">🌍</span>
@@ -267,10 +263,8 @@ const HomePage = ({
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Map Section */}
           <div className="space-y-6">
             <Card className="card-hover">
               <CardHeader>
@@ -295,15 +289,12 @@ const HomePage = ({
               </CardContent>
             </Card>
 
-            {/* Quick Stats */}
             {environmentalData && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Activity className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">
-                      {environmentalData.aqi_data.aqi}
-                    </p>
+                    <p className="text-2xl font-bold">{environmentalData.aqi_data.aqi}</p>
                     <p className="text-sm text-gray-600">AQI</p>
                   </CardContent>
                 </Card>
@@ -311,9 +302,7 @@ const HomePage = ({
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Thermometer className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">
-                      {environmentalData.weather_data.temperature}°
-                    </p>
+                    <p className="text-2xl font-bold">{environmentalData.weather_data.temperature}°</p>
                     <p className="text-sm text-gray-600">Temp</p>
                   </CardContent>
                 </Card>
@@ -321,9 +310,7 @@ const HomePage = ({
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Wind className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">
-                      {environmentalData.weather_data.wind_speed}
-                    </p>
+                    <p className="text-2xl font-bold">{environmentalData.weather_data.wind_speed}</p>
                     <p className="text-sm text-gray-600">Wind km/h</p>
                   </CardContent>
                 </Card>
@@ -331,20 +318,15 @@ const HomePage = ({
                 <Card className="text-center card-hover">
                   <CardContent className="p-4">
                     <Droplets className="h-8 w-8 text-cyan-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">
-                      {environmentalData.weather_data.humidity}%
-                    </p>
+                    <p className="text-2xl font-bold">{environmentalData.weather_data.humidity}%</p>
                     <p className="text-sm text-gray-600">Humidity</p>
                   </CardContent>
                 </Card>
               </div>
             )}
-            {/* Environmental Data Section Below Map */}
+
             {environmentalData && (
               <div className="grid grid-rows-2 gap-2">
-                {" "}
-                {/* reduced gap from 4 -> 2 and removed mt-10 */}
-                {/* Row 1: Weather (full width) */}
                 <div className="row-span-1">
                   <Card className="text-center card-hover">
                     <CardHeader>
@@ -357,31 +339,21 @@ const HomePage = ({
                       <div className="flex flex-col md:flex-row justify-around items-center gap-6">
                         <div>
                           <p className="text-gray-600">Temperature</p>
-                          <p className="text-2xl font-bold">
-                            {environmentalData.weather_data.temperature}°C
-                          </p>
+                          <p className="text-2xl font-bold">{environmentalData.weather_data.temperature}°C</p>
                         </div>
                         <div>
                           <p className="text-gray-600">Humidity</p>
-                          <p className="text-2xl font-bold">
-                            {environmentalData.weather_data.humidity}%
-                          </p>
+                          <p className="text-2xl font-bold">{environmentalData.weather_data.humidity}%</p>
                         </div>
                         <div>
                           <p className="text-gray-600">Wind Speed</p>
-                          <p className="text-2xl font-bold">
-                            {environmentalData.weather_data.wind_speed} km/h
-                          </p>
+                          <p className="text-2xl font-bold">{environmentalData.weather_data.wind_speed} km/h</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
-                {/* Row 2: Noise Pollution and Water Logging Risk */}
                 <div className="row-span-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {" "}
-                  {/* reduced gap from 6 -> 4 */}
-                  {/* Noise Pollution */}
                   <Card className="text-center card-hover">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 justify-center">
@@ -393,22 +365,15 @@ const HomePage = ({
                       {environmentalData.noise_data ? (
                         <div className="flex flex-col gap-2">
                           <p className="text-gray-600">Level</p>
-                          <Badge className="bg-purple-500 text-white">
-                            {environmentalData.noise_data.level}
-                          </Badge>
+                          <Badge className="bg-purple-500 text-white">{environmentalData.noise_data.level}</Badge>
                           <p className="text-gray-600">dB Range</p>
-                          <p className="text-2xl font-bold">
-                            {environmentalData.noise_data.db_range}
-                          </p>
+                          <p className="text-2xl font-bold">{environmentalData.noise_data.db_range}</p>
                         </div>
                       ) : (
-                        <p className="text-gray-500">
-                          Noise data not available
-                        </p>
+                        <p className="text-gray-500">Noise data not available</p>
                       )}
                     </CardContent>
                   </Card>
-                  {/* Water Logging Risk */}
                   <Card className="text-center card-hover">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 justify-center">
@@ -418,21 +383,16 @@ const HomePage = ({
                     </CardHeader>
                     <CardContent>
                       <Badge
-                        className={`text-lg px-4 py-2 ${
-                          environmentalData.water_logging_risk === "low"
-                            ? "bg-green-100 text-green-700"
-                            : environmentalData.water_logging_risk === "medium"
+                        className={`text-lg px-4 py-2 ${environmentalData.water_logging_risk === "low"
+                          ? "bg-green-100 text-green-700"
+                          : environmentalData.water_logging_risk === "medium"
                             ? "bg-yellow-100 text-yellow-700"
                             : "bg-red-100 text-red-700"
-                        }`}
+                          }`}
                       >
-                        {environmentalData.water_logging_risk?.toUpperCase() ||
-                          "N/A"}{" "}
-                        RISK
+                        {environmentalData.water_logging_risk?.toUpperCase() || "N/A"} RISK
                       </Badge>
-                      <p className="text-gray-600 mt-2 text-sm">
-                        Based on topography, drainage, and historical data
-                      </p>
+                      <p className="text-gray-600 mt-2 text-sm">Based on topography, drainage, and historical data</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -440,7 +400,6 @@ const HomePage = ({
             )}
           </div>
 
-          {/* Environmental Report Section */}
           <div className="space-y-6">
             {showReport && environmentalData ? (
               <EnvironmentalReport
@@ -478,6 +437,30 @@ const HomePage = ({
             )}
           </div>
         </div>
+      </div>
+
+      {/* CIRCULAR CAUTION BUTTON */}
+      <div className="fixed bottom-24 right-6 z-50">
+        <button
+          onClick={() => {
+            // We send the current location as "state" so the report page knows where we are
+            navigate("/report", { state: { initialLocation: currentLocation } });
+          }}
+          className="group relative flex items-center justify-center w-16 h-16 transition-all hover:scale-110 active:scale-95 drop-shadow-lg"
+        >
+          {/* Solid White Circle Background */}
+          <div className="absolute inset-0 bg-white rounded-full border border-slate-100 shadow-sm transition-colors group-hover:bg-slate-50"></div>
+
+          {/* Subtle Pulse Effect */}
+          <div className="absolute inset-0 bg-yellow-100 rounded-full animate-ping opacity-25"></div>
+
+          {/* The Alert Icon - Green/Emerald to match theme */}
+          <AlertTriangle
+            className="relative z-10 text-yellow-600 h-8 w-8 stroke-[2.5px]"
+            fill="currentColor"
+            fillOpacity="0.1"
+          />
+        </button>
       </div>
     </div>
   );
