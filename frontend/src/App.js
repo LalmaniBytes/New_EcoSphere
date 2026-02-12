@@ -8,6 +8,7 @@ import ChatPage from "./pages/ChatPage";
 import JoinHands from "./pages/joinhands";
 import ReportIssuePage from "./pages/ReportIssue";
 import Footer from "./components/footer";
+import Dash from "./pages/Dash";
 import ChatWidget from "./pages/chatwidget";
 import SignupPage from "./pages/SignUpPage";
 import About from './pages/About';
@@ -85,7 +86,8 @@ function AppContent({ currentLocation, setCurrentLocation, locationPermission })
           <Route path="/mentalhealth" element={<MentalHealthAudio />} />
           <Route path="/comparison" element={<ComparisonPage />} />
           <Route path="/About" element={<About />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/dash" element={<Dash />} />
+          
           <Route path="/admin-login" element={<AdminLogin />} />
           
           {/* ADMIN PANEL ROUTES */}
