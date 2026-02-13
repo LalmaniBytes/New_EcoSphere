@@ -1,32 +1,31 @@
 import mongoose from "mongoose";
 
-const RewardSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
+const rewardSchema = new mongoose.Schema({
+  title: { 
+    type: String, 
+    required: true 
   },
-  description: {
-    type: String,
-    required: true, 
+  description: { 
+    type: String, 
+    required: true 
   },
-  cost: {
-    type: Number,
-    required: true,
+  cost: { 
+    type: Number, 
+    required: true 
   },
-  category: {
-    type: String,
-    enum: ["Premium", "Discount", "Product", "Donation"],
-    default: "Premium",
+  category: { 
+    type: String, 
+    enum: ['Product', 'Premium', 'Discount'], 
+    default: 'Product' 
   },
-  image: {
-    type: String,
-    default: "default-reward.png",
+  icon: {
+    type: String, // 'leaf', 'star', 'tag' etc.
+    default: 'leaf'
   },
-  isActive: {
-    type: Boolean,
-    default: true, 
-  },
+  isActive: { 
+    type: Boolean, 
+    default: true 
+  }
 });
 
-module.exports = mongoose.model("Reward", RewardSchema);
+export default mongoose.model("Reward", rewardSchema);

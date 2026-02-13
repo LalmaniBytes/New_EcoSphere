@@ -1,6 +1,5 @@
 import express from "express";
 import userModel from "../models/user.model.js";
-import rewardModel from "../models/reward.model.js"; // Optional, can return empty array if not used
 import { authenticateToken } from "../middleware/jwtAuth.js";
 
 const gamificationRouter = express.Router();
@@ -11,21 +10,21 @@ gamificationRouter.get("/stats", authenticateToken, async (req, res) => {
     const user = await userModel.findById(req.user.id);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // 1. Calculate Progress Logic
+    // 1. Calculate Rank (Count users with MORE points than current user)
+    const usersWithMorePoints = await userModel.countDocuments({ points: { $gt: user.points } });
+    const globalRank = usersWithMorePoints + 1; 
+
+    // 2. Calculate Level Progress
     let nextLevelThreshold = 1000;
     if (user.points >= 1000) nextLevelThreshold = 2500;
     if (user.points >= 2500) nextLevelThreshold = 5000;
     
     const progress = Math.min(100, Math.floor((user.points / nextLevelThreshold) * 100));
 
-    // 2. Calculate Global Rank Logic
-    // "Count how many people have strictly MORE points than me"
-    const usersWithMorePoints = await userModel.countDocuments({ points: { $gt: user.points } });
-    const globalRank = usersWithMorePoints + 1; 
-
     res.json({
-      points: user.points,
-      rankTitle: user.rankTitle || "Novice", // Ensure default
+      _id: user._id,
+      points: user.points || 0,
+      rankTitle: user.rankTitle || "Novice",
       streak: user.streak?.count || 0,
       nextLevelThreshold,
       progressPercentage: progress,
@@ -38,15 +37,19 @@ gamificationRouter.get("/stats", authenticateToken, async (req, res) => {
   }
 });
 
-// --- GET REWARDS ---
-gamificationRouter.get("/rewards", async (req, res) => {
-  // If you don't have a reward model yet, return empty array
-  res.json([]); 
+// --- GET REWARDS (Static Data) ---
+gamificationRouter.get("/rewards", (req, res) => {
+  // Sending static rewards so the frontend always has data
+  res.json([
+    { _id: "r1", title: 'Eco-Friendly Bottle', cost: 500, category: 'Product', description: 'Sustainable bamboo water bottle' },
+    { _id: "r2", title: 'Premium Badge', cost: 2000, category: 'Premium', description: 'Exclusive profile recognition' },
+    { _id: "r3", title: 'Local Store Discount', cost: 800, category: 'Discount', description: '20% off at partner eco-stores' }
+  ]);
 });
 
 // --- REDEEM REWARD ---
 gamificationRouter.post("/redeem", authenticateToken, async (req, res) => {
-  const { cost } = req.body; // Accepting cost directly for simplicity
+  const { cost } = req.body; 
   try {
     const user = await userModel.findById(req.user.id);
     
@@ -55,7 +58,7 @@ gamificationRouter.post("/redeem", authenticateToken, async (req, res) => {
     user.points -= cost;
     await user.save();
 
-    res.json({ success: true, message: `Redeemed successfully!`, newBalance: user.points });
+    res.json({ success: true, message: "Redeemed successfully!", newBalance: user.points });
   } catch (error) {
     res.status(500).json({ error: "Transaction failed" });
   }
