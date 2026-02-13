@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // Added useEffect
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,19 +11,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, CheckCircle2, MapPin, Camera, Building2, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, MapPin, Building2, Loader2 } from "lucide-react";
 import axios from "axios";
+import { toast } from "sonner"; // Assuming you use sonner for consistency
 
 export default function ReportIssuePage() {
   const [issues, setIssues] = useState([]);
   const [newIssue, setNewIssue] = useState({ 
     title: "", 
     description: "", 
-    location: "",
+    location: "", // Human readable address
+    lat: null,    // For Database
+    lng: null,    // For Database
     department: "" 
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const departments = [
     "Environmental",
@@ -39,27 +43,41 @@ export default function ReportIssuePage() {
     const fetchLocation = async () => {
       if (navigator.geolocation) {
         setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          try {
-            const { latitude, longitude } = position.coords;
-            // Using OpenStreetMap reverse geocoding
-            const response = await axios.get(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            const address = response.data.display_name;
-            setNewIssue(prev => ({ ...prev, location: address }));
-          } catch (error) {
-            console.error("Geocoding error", error);
-          } finally {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            try {
+              const { latitude, longitude } = position.coords;
+              // Reverse Geocoding via OpenStreetMap
+              const response = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              );
+              const address = response.data.display_name;
+              
+              setNewIssue(prev => ({ 
+                ...prev, 
+                location: address,
+                lat: latitude,
+                lng: longitude
+              }));
+            } catch (error) {
+              console.error("Geocoding error", error);
+              toast.error("Location detected but could not fetch address.");
+            } finally {
+              setIsLocating(false);
+            }
+          },
+          (error) => {
+            console.error("Geolocation error", error);
             setIsLocating(false);
+            toast.error("Please enable location permissions.");
           }
-        });
+        );
       }
     };
     fetchLocation();
   }, []);
 
-  // 2. SMART DEPARTMENT SELECTION (Keyword Matching)
+  // 2. SMART DEPARTMENT SELECTION
   useEffect(() => {
     const title = newIssue.title.toLowerCase();
     let suggestedDept = "";
@@ -81,21 +99,52 @@ export default function ReportIssuePage() {
     }
   }, [newIssue.title]);
 
-  const handleReportIssue = () => {
-    if (!newIssue.title || !newIssue.description || !newIssue.department)
-      return alert("Please fill all required fields!");
+  // 3. POST TO DATABASE
+  const handleReportIssue = async () => {
+    if (!newIssue.title || !newIssue.description || !newIssue.department) {
+      return toast.error("Please fill all required fields!");
+    }
     
-    const reported = { 
-        ...newIssue, 
-        id: Date.now(), 
-        status: "Pending", 
-        date: new Date().toLocaleDateString() 
-    };
-    
-    setIssues((prev) => [reported, ...prev]);
-    setNewIssue({ title: "", description: "", location: newIssue.location, department: "" });
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
+    setLoading(true);
+
+    try {
+      // Prepare the payload for your backend (matching your Database schema)
+      const reportData = {
+        title: newIssue.title,
+        description: newIssue.description,
+        department: newIssue.department,
+        location_address: newIssue.location,
+        latitude: newIssue.lat,
+        longitude: newIssue.lng,
+        status: "Pending",
+        timestamp: new Date().toISOString()
+      };
+
+      // REPLACE '/civic-reports' with your actual API endpoint
+      const response = await axios.post("/civic-reports", reportData);
+
+      setIssues((prev) => [response.data, ...prev]);
+      
+      // Reset form but keep the location for next report if needed
+      setNewIssue({ 
+        title: "", 
+        description: "", 
+        location: newIssue.location, 
+        lat: newIssue.lat, 
+        lng: newIssue.lng, 
+        department: "" 
+      });
+      
+      setIsSubmitted(true);
+      toast.success("Issue reported to database!");
+      setTimeout(() => setIsSubmitted(false), 3000);
+
+    } catch (error) {
+      console.error("Database submission error:", error);
+      toast.error("Failed to save report to server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -123,7 +172,7 @@ export default function ReportIssuePage() {
           </CardHeader>
           <CardContent className="space-y-5 pt-6">
             
-            {/* Issue Title - Triggers Smart Dept */}
+            {/* Issue Title */}
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1 text-emerald-600 uppercase">What is the issue?</label>
               <Input
@@ -134,7 +183,7 @@ export default function ReportIssuePage() {
               />
             </div>
 
-            {/* Exact Location - Auto-filled but Editable */}
+            {/* Exact Location */}
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1 text-emerald-600 uppercase flex justify-between">
                 Exact Location
@@ -151,7 +200,7 @@ export default function ReportIssuePage() {
               </div>
             </div>
 
-            {/* Department Dropdown - Auto-selected but Editable */}
+            {/* Department Dropdown */}
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1 text-emerald-600 uppercase">Relevant Department</label>
               <Select 
@@ -188,8 +237,9 @@ export default function ReportIssuePage() {
             <Button
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-6 text-lg font-black shadow-lg transition-transform active:scale-95"
               onClick={handleReportIssue}
+              disabled={loading}
             >
-              Post Report
+              {loading ? <Loader2 className="animate-spin mr-2" /> : "Post Report"}
             </Button>
           </CardContent>
         </Card>
@@ -206,7 +256,7 @@ export default function ReportIssuePage() {
                   <CardContent className="p-4 flex justify-between items-center">
                     <div>
                       <h4 className="font-bold text-lg">{issue.title}</h4>
-                      <p className="text-xs text-slate-500">{issue.location}</p>
+                      <p className="text-xs text-slate-500">{issue.location_address || issue.location}</p>
                       <Badge variant="outline" className="mt-2 text-emerald-600 border-emerald-600">{issue.department}</Badge>
                     </div>
                     <Badge className="bg-red-100 text-red-700 border-red-200">{issue.status}</Badge>

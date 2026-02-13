@@ -23,14 +23,20 @@ axios.defaults.withCredentials = true;
 
 // --- Sub-Components ---
 
-const DriveCard = ({ drive, onJoin }) => {
+const DriveCard = ({ drive, onJoin, currentUserId }) => {
   const [isJoining, setIsJoining] = useState(false);
   
-  // Logic: Just count participants
+  // Logic: Check if user is already in the participants array
   const currentParticipants = drive.participants ? drive.participants.length : 0;
   const pointsReward = drive.pointsReward || 100;
+  
+  // Check if currentUserId exists in drive.participants
+  const hasJoined = drive.participants?.some(p => 
+    (typeof p === 'string' ? p : p._id) === currentUserId
+  );
 
   const handleJoin = async () => {
+    if (hasJoined) return;
     setIsJoining(true);
     await onJoin(drive._id, pointsReward); 
     setIsJoining(false);
@@ -56,7 +62,16 @@ const DriveCard = ({ drive, onJoin }) => {
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-4 h-4" /><span className="text-sm">{drive.location}</span>
               </div>
-              <div className="text-xs text-slate-400 mt-1">Organized by: {drive.organizer?.username || "EcoUser"}</div>
+              
+              {/* CORRECTED ORGANIZER LOGIC FROM OLD CODE */}
+              <div className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                <span>Organized by: </span>
+                <span className="font-bold text-[#2E7D32]">
+                  {drive.organizer?.username || "EcoUser"}
+                </span>
+              </div>
+              
             </div>
             <p className="text-gray-600 text-sm mb-4 line-clamp-2">{drive.description}</p>
             
@@ -77,10 +92,14 @@ const DriveCard = ({ drive, onJoin }) => {
             <div className="mt-auto">
               <button 
                 onClick={handleJoin} 
-                disabled={isJoining}
-                className="w-full md:w-auto bg-[#2E7D32] hover:bg-[#1B5E20] text-white hover:-translate-y-0.5 rounded-full px-8 py-3 font-semibold shadow-md transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isJoining || hasJoined}
+                className={`w-full md:w-auto rounded-full px-8 py-3 font-semibold shadow-md transition-all disabled:opacity-80 
+                  ${hasJoined 
+                    ? "bg-slate-400 cursor-not-allowed text-white" 
+                    : "bg-[#2E7D32] hover:bg-[#1B5E20] text-white hover:-translate-y-0.5"
+                  }`}
               >
-                {isJoining ? 'Joining...' : 'Join Drive'}
+                {isJoining ? 'Joining...' : hasJoined ? 'Joined ' : 'Join Drive'}
               </button>
             </div>
           </div>
@@ -98,6 +117,9 @@ export default function JoinHands() {
   const [loading, setLoading] = useState(true);
   const [filterLocation, setFilterLocation] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  
+  // Track current logged in user ID
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const [userStats, setUserStats] = useState({
     points: 0,
@@ -129,6 +151,12 @@ export default function JoinHands() {
       ]);
       setUserStats(statsRes.data);
       setRewards(rewardsRes.data);
+      
+      if (statsRes.data.userId) {
+        setCurrentUserId(statsRes.data.userId);
+      } else if (statsRes.data._id) {
+        setCurrentUserId(statsRes.data._id);
+      }
     } catch (error) {
       console.error("Failed to fetch gamification data.", error);
     }
@@ -148,12 +176,7 @@ export default function JoinHands() {
       await axios.post(`/cleanup-drive/join/${driveId}`);
       alert(`✅ Successfully joined! +${drivePoints} points added.`);
       
-      // Update UI Immediately
-      setUserStats(prev => ({ ...prev, points: prev.points + drivePoints }));
-      
-      // Refresh Data from backend to ensure everything is synced (Rank, counts, etc)
-      fetchDrives(); 
-      fetchGamificationData();
+      await Promise.all([fetchDrives(), fetchGamificationData()]);
     } catch (error) {
       const msg = error.response?.data?.error || "Failed to join drive.";
       alert(`❌ ${msg}`);
@@ -184,7 +207,6 @@ export default function JoinHands() {
     try {
       const response = await axios.post("/gamification/redeem", { rewardId, cost });
       alert(`🎉 ${response.data.message}`);
-      // Sync points after redemption
       setUserStats(prev => ({ ...prev, points: response.data.newBalance }));
     } catch (error) {
       alert("❌ Redemption failed.");
@@ -274,7 +296,12 @@ export default function JoinHands() {
                 <div className="flex flex-col gap-6">
                   {filteredDrives.length > 0 ? (
                     filteredDrives.map((drive) => (
-                      <DriveCard key={drive._id} drive={drive} onJoin={handleJoinDrive} />
+                      <DriveCard 
+                        key={drive._id} 
+                        drive={drive} 
+                        onJoin={handleJoinDrive} 
+                        currentUserId={currentUserId}
+                      />
                     ))
                   ) : (
                     <p className="text-center text-slate-500 py-10">No drives found matching your criteria.</p>
@@ -283,7 +310,7 @@ export default function JoinHands() {
               )}
             </div>
 
-            {/* Rewards */}
+            {/* Rewards Section */}
             <div className="pt-12 border-t border-slate-200">
                <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-[#2E7D32]">Redeem Points</h2>
